@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DesignOnDemand Landing (Figma-Inspired)</title>
+  <style>
+    /* ------------------------------------------------
+       1) BASIC RESET & GLOBAL STYLES
+    --------------------------------------------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin:10px;
+      height: 100%;
+      font-family: 'Hubot Sans', Arial, sans-serif; /* As Figma references */
+      background-color: #3701ae; /* The requested background */
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
+
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+
+    /* ------------------------------------------------
+       2) LOADER OVERLAY
+    --------------------------------------------------- */
+    .loader-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid #fff;
+      border-top: 8px solid #3701ae;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ------------------------------------------------
+       3) TOP BAR (LOGIN/LOGOUT/DASHBOARD)
+    --------------------------------------------------- */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: rgba(0,0,0,0.1);
+    }
+    .login-btn, .logout-btn, .dashboard-btn {
+      background-color: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .login-btn:hover,
+    .logout-btn:hover,
+    .dashboard-btn:hover {
+      background-color: #fff;
+      color: #3701ae;
+    }
+
+    /* ------------------------------------------------
+       4) HERO SECTION (Figma-inspired)
+    --------------------------------------------------- */
+    .hero {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      position: relative;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-row {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .premium-text {
+      font-family: 'Hubot Sans', sans-serif;
+      font-size: 200px;
+      line-height: 120%;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .design-services-text {
+      font-family: 'Hubot Sans', sans-serif;
+      font-size: 200px;
+      line-height: 120%;
+      font-weight: 500;
+      color: #fff;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .flat-rate-line {
+      position: absolute;
+      top: 81px; 
+      right: 0px;
+      width: 565px;
+      font-family: 'Hubot Sans', sans-serif;
+      font-weight: 400;
+      font-size: 21px;
+      line-height: 120%;
+      color: #fff;
+    }
+
+    .hero-cta-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1rem;
+      width: 190px;
+      height: 51px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #FFFFFF;
+      border-radius: 16px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .hero-cta-btn:hover {
+      background-color: #fff;
+      color: #3701ae;
+    }
+
+    /* ------------------------------------------------
+       5) ON DEMAND SECTION (3-liner)
+    --------------------------------------------------- */
+    .on-demand-section {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem; 
+    }
+    .on-demand-line {
+      font-family: 'Hubot Sans', sans-serif;
+      font-weight: 500;
+      margin-top: 60px;
+      font-size: 90px;
+      line-height: 120%;
+      color: #fff;
+    }
+    .on-demand-line.left {
+      text-align: left;
+    }
+    .on-demand-line.center {
+      text-align: center;
+    }
+    .on-demand-line.right {
+      text-align: right;
+    }
+
+    /* ------------------------------------------------
+       6) WHY CHOOSE
+    --------------------------------------------------- */
+    .why-choose {
+      width: 100%;
+      max-width: 1760px; 
+      margin: 0 auto;
+      padding: 4rem 1rem;
+    }
+    .why-choose-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+    }
+    .why-left {
+      flex: 1;
+      font-family: 'Hubot Sans';
+      font-size: 67px;
+      line-height: 80px;
+      font-weight: 500;
+    }
+    .why-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5rem;
+    }
+    .reason h3 {
+      font-family: 'Hubot Sans';
+      font-size: 38px;
+      line-height: 46px;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .reason p {
+      font-family: 'Hubot Sans';
+      font-size: 21px;
+      line-height: 25px;
+      font-weight: 400;
+      color: #EFEFEF;
+    }
+
+    /* ------------------------------------------------
+       7) OUR SERVICES
+    --------------------------------------------------- */
+    .services {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    .services h2 {
+      font-family: 'Hubot Sans';
+      font-size: 67px;
+      line-height: 80px;
+      font-weight: 500;
+      margin-bottom: 2rem;
+    }
+    .services-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 80px 32px;
+      justify-content: space-around;
+      margin-bottom: 2rem;
+    }
+    .service-card {
+      flex: 0 0 400px; 
+      min-height: 180px;
+    }
+    .service-card h3 {
+      font-size: 20px;
+      line-height: 34px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .service-card ul {
+      list-style: disc;
+      margin-left: 1.5rem;
+      line-height: 1.6;
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    /* ------------------------------------------------
+       8) PRICING CALCULATOR
+    --------------------------------------------------- */
+    .pricing-calculator {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+    }
+    .pricing-calculator h2 {
+      font-family: 'Hubot Sans';
+      font-size: 67px;
+      line-height: 80px;
+      margin-bottom: 30px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .pricing-calculator .subheading {
+      font-family: 'Hubot Sans';
+      font-size: 38px;
+      line-height: 46px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .pricing-calculator .desc {
+      font-family: 'Hubot Sans';
+      font-size: 21px;
+      line-height: 25px;
+      font-weight: 400;
+      text-align: center;
+      color: #EFEFEF;
+      max-width: 1000px;
+      margin: 0.5rem auto 2rem auto;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .tab {
+      position: relative;
+      background-color: transparent;
+      border: 2px solid #FFF;
+      border-radius: 20px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 21px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .tab.active {
+      color: #fff;
+      background-color: #05d76a;
+      font-weight: 600;
+    }
+    .tab:hover {
+      background-color: #05d76a;
+      color: #fff;
+    }
+    .tab-indicator {
+      display: none; 
+    }
+
+    .calculator-body {
+      display: none;
+      margin-bottom: 2rem;
+    }
+    .calculator-body.active-body {
+      display: block;
+    }
+
+    .service-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .service-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+    .toggle-switch input {
+      display: none;
+    }
+    .toggle-switch label {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-color: #ccc;
+      border-radius: 34px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.4s;
+    }
+    .toggle-switch label::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.4s;
+    }
+    .toggle-switch input:checked + label {
+      background-color: #00D76A;
+    }
+    .toggle-switch input:checked + label::before {
+      transform: translateX(26px);
+    }
+
+    .service-info {
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .service-info h3 {
+      font-size: 28px;
+      line-height: 34px;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .service-info p {
+      font-size: 21px;
+      line-height: 25px;
+      color: #EFEFEF;
+    }
+    .service-price {
+      text-align: right;
+      font-size: 28px;
+      line-height: 34px;
+      font-weight: 600;
+    }
+    .service-price .vat {
+      display: block;
+      font-size: 16px;
+      opacity: 0.3;
+    }
+
+    .investment-area h3 {
+      font-size: 38px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .investment-area p {
+      font-size: 21px;
+      line-height: 25px;
+      font-weight: 400;
+      color: #EFEFEF;
+      margin-bottom: 1rem;
+    }
+
+    .normal-advance-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .normal-advance-toggle .mode-label {
+      font-family: 'Hubot Sans';
+      font-weight: 600;
+      font-size: 28px;
+      line-height: 34px;
+    }
+
+    .grand-total {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .grand-total .amount {
+      font-family: 'Hubot Sans';
+      font-size: 90px;
+      line-height: 108px;
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+    }
+    .grand-total .label {
+      font-size: 21px;
+      line-height: 25px;
+      color: #EFEFEF;
+      margin-bottom: 2rem;
+    }
+    .grand-total .btn-get-started {
+      display: inline-block;
+      padding: 16px 24px;
+      gap: 8px;
+      border: 1px solid #fff;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .grand-total .btn-get-started:hover {
+      background-color: #fff;
+      color: #3701ae;
+    }
+
+    /* ADVANCED ONLY SECTION */
+    .advanced-only {
+      display: none;
+    }
+    .advanced-only.visible {
+      display: block;
+    }
+
+    /* URGENCY OPTIONS (4 checkboxes) */
+    .urgency-options {
+      display: none; /* hidden by default, only show in advanced mode */
+      margin-bottom: 2rem;
+      justify-content: space-around;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+    .urgency-options.visible {
+      display: flex;
+    }
+    .urgency-options label {
+      cursor: pointer;
+      border: 1px solid #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      min-width: 200px;
+      transition: background-color 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .urgency-options input {
+      display: none; /* Hide the raw checkbox */
+    }
+    /* The "checked" style */
+    .urgency-options input:checked + .check-content {
+      background-color: #05d76a;
+      color: #3701ae;
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+
+    .check-content .title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .check-content .subtitle {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    /* ------------------------------------------------
+       9) CONTACT US
+    --------------------------------------------------- */
+    .contact-us {
+      width: 100%;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    .contact-us h2 {
+      font-size: 67px;
+      line-height: 80px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .contact-us p {
+      font-size: 21px;
+      line-height: 25px;
+      font-weight: 400;
+      color: #EFEFEF;
+      max-width: 700px;
+      margin: 0 auto 2rem auto;
+    }
+    .contact-form {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .contact-form label {
+      text-align: center;
+      font-weight: 600;
+      font-size: 25px;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      border: none;
+      width: 500px;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 30px;
+      font-size: 1.1rem; 
+      color: #333;
+    }
+    .btn-send {
+      align-self: flex-end;
+      color: #FFF;
+      border: 2px solid #FFF;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .btn-send:hover {
+      background-color: #FFF;
+      color: #3701ae;
+    }
+
+    /* ------------------------------------------------
+       10) RESPONSIVE MEDIA QUERIES
+    --------------------------------------------------- */
+    @media (max-width: 900px) {
+      .premium-text, .design-services-text {
+        font-size: 48px !important;
+      }
+      .flat-rate-line {
+        position: static;
+        width: auto;
+        margin-top: 1rem;
+      }
+      .hero-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .on-demand-line {
+        font-size: 36px !important;
+      }
+      .why-left {
+        font-size: 32px !important;
+      }
+      .reason h3 {
+        font-size: 24px !important;
+      }
+      .reason p {
+        font-size: 16px !important;
+      }
+      .services h2 {
+        font-size: 36px !important;
+      }
+      .service-card {
+        flex: 1 1 100%;
+      }
+      .pricing-calculator h2 {
+        font-size: 36px !important;
+      }
+      .pricing-calculator .subheading {
+        font-size: 24px !important;
+      }
+      .pricing-calculator .desc {
+        font-size: 16px !important;
+      }
+      .service-info h3,
+      .service-price {
+        font-size: 20px !important;
+      }
+      .grand-total .amount {
+        font-size: 48px !important;
+      }
+
+      .urgency-options label {
+        min-width: 120px;
+      }
+      .urgency-options .check-content .title {
+        font-size: 18px;
+      }
+      .urgency-options .check-content .subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADER OVERLAY -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar" id="topBar">
+    <!-- We'll build login/logout from JS -->
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-row">
+      <div class="premium-text">Premium</div>
+      <div class="flat-rate-line">
+        Flat-rate UI/UX, Branding, and Graphic Design Services tailored 
+        for startups, businesses, and agencies delivered fast, with zero hassle.
+      </div>
+    </div>
+    <div class="design-services-text">Design Services</div>
+    <a href="#" class="hero-cta-btn" id="ctaCalculateBtn">CALCULATE</a>
+  </section>
+
+  <!-- ON DEMAND SECTION (3-liner) -->
+  <section class="on-demand-section">
+    <div class="on-demand-line left">On Demand.</div>
+    <div class="on-demand-line center">Anytime.</div>
+    <div class="on-demand-line right">Anywhere</div>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="why-choose">
+    <div class="why-choose-wrapper">
+      <div class="why-left">
+        Why Choose<br/>DesignOnDemand?
+      </div>
+      <div class="why-right">
+        <div class="reason">
+          <h3>🎯 Flat-Rate Monthly Packages</h3>
+          <p>No hidden costs, just premium design work on demand.</p>
+        </div>
+        <div class="reason">
+          <h3>🚀 Fast Turnaround & Unlimited Revisions</h3>
+          <p>Get your designs quickly with unlimited revisions to match your vision.</p>
+        </div>
+        <div class="reason">
+          <h3>💼 Expert Designers at Your Fingertips</h3>
+          <p>Over 12+ years of experience in UI/UX, branding, and corporate design.</p>
+        </div>
+        <div class="reason">
+          <h3>🌐 100% Remote & Flexible</h3>
+          <p>Work with us from anywhere, anytime.</p>
+        </div>
+        <div class="reason">
+          <h3>💳 Pay Online & Manage Easily</h3>
+          <p>Select services, pay securely, and track your requests.</p>
+        </div>
+        <div class="reason">
+          <h3>📌 Perfect for</h3>
+          <p>Startups, SMEs, Agencies, and Enterprises looking for professional 
+             design without hiring a full-time designer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR SERVICES -->
+  <section class="services">
+    <h2>Our Services</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <h3><span class="emoji">🔥</span> UI/UX Design & Digital Product Strategy</h3>
+        <ul>
+          <li>Website & Mobile App UI/UX</li>
+          <li>SaaS Platform & Dashboard Design</li>
+          <li>Wireframing & Prototyping</li>
+          <li>Design System Creation</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🎨</span> Branding & Visual Identity</h3>
+        <ul>
+          <li>Logo Design & Brand Guidelines</li>
+          <li>Corporate Stationery & Business Cards</li>
+          <li>Marketing & Social Media Graphics</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">📄</span> Corporate & Business Design</h3>
+        <ul>
+          <li>Company Profile & Pitch Decks</li>
+          <li>Brochures, Flyers & Digital Ads</li>
+          <li>Infographics & Presentation Design</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🎨</span> Branding & Visual Identity</h3>
+        <ul>
+          <li>Logo Design & Brand Guidelines</li>
+          <li>Corporate Stationery & Business Cards</li>
+          <li>Marketing & Social Media Graphics</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">📄</span> Corporate & Business Design</h3>
+        <ul>
+          <li>Company Profile & Pitch Decks</li>
+          <li>Brochures, Flyers & Digital Ads</li>
+          <li>Infographics & Presentation Design</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🔥</span> UI/UX Design & Digital Product Strategy</h3>
+        <ul>
+          <li>Website & Mobile App UI/UX</li>
+          <li>SaaS Platform & Dashboard Design</li>
+          <li>Wireframing & Prototyping</li>
+          <li>Design System Creation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="services-button">
+      <a href="#" class="btn-calc" id="btnCalcPlan">CALCULATE MY PLAN</a>
+    </div>
+  </section>
+
+  <!-- PRICING CALCULATOR -->
+  <section class="pricing-calculator" id="pricingCalculator">
+    <h2>Pricing Calculator</h2>
+    <p class="subheading">Instant Pricing Calculator</p>
+    <p class="desc">
+      Users can select their desired services, choose a turnaround time, and see a transparent cost breakdown before paying online.
+    </p>
+
+    <!-- TABS -->
+    <div class="tabs" id="tabsContainer">
+      <div class="tab-indicator"></div>
+      <!-- Tabs inserted via JS -->
+    </div>
+
+    <!-- Dynamic .calculator-body elements inserted via JS -->
+
+    <!-- ADVANCED-ONLY items -->
+    <div class="advanced-only" id="advancedOnlySection">
+     
+    </div>
+
+    <!-- URGENCY OPTIONS (4 checkboxes in a row) -->
+    <div class="urgency-options" id="urgencyOptions">
+      <!-- NO HUSTAL -->
+      <label>
+        <input type="checkbox" id="urgencyNoHustle"/>
+        <div class="check-content">
+          <div class="title">No Hustal</div>
+          <div class="subtitle">Take your time but I need something nice.</div>
+        </div>
+      </label>
+
+      <!-- ASAP -->
+      <label>
+        <input type="checkbox" id="urgencyASAP"/>
+        <div class="check-content">
+          <div class="title">ASAP</div>
+          <div class="subtitle">Within 15 Days</div>
+        </div>
+      </label>
+
+      <!-- URGET -->
+      <label>
+        <input type="checkbox" id="urgencyUrget"/>
+        <div class="check-content">
+          <div class="title">Urget</div>
+          <div class="subtitle">Within 7 Days</div>
+        </div>
+      </label>
+
+      <!-- SUPER URGENT -->
+      <label>
+        <input type="checkbox" id="urgencySuper"/>
+        <div class="check-content">
+          <div class="title">Super Urgent</div>
+          <div class="subtitle">Within 3 working days</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="investment-area">
+      <h3>Total Investment</h3>
+      <p>This reflects only the sum of selected items in this section.</p>
+    </div>
+
+    <!-- Normal/Advance Toggle -->
+    <div class="normal-advance-toggle">
+      <span class="mode-label">Normal</span>
+      <div class="toggle-switch">
+        <input type="checkbox" id="toggleMode2">
+        <label for="toggleMode2"></label>
+      </div>
+      <span class="mode-label">Advance</span>
+    </div>
+
+    <!-- Grand Total -->
+    <div class="grand-total">
+      <div class="amount" id="grandTotalAmt">0.00 AED</div>
+      <div class="label">Grand Total</div>
+      <a href="#" class="btn-get-started" id="getStartedBtn">Get Started</a>
+    </div>
+  </section>
+
+  <!-- CONTACT US -->
+  <section class="contact-us">
+    <h2>Contact Us</h2>
+    <p>Need something specific or want to speak to an expert? Fill out the form below and we’ll get in touch soon!</p>
+    <form class="contact-form" id="contactForm">
+      <div class="form-group">
+        <label for="contactName">Name</label>
+        <input 
+          type="text"
+          id="contactName"
+          name="contactName"
+          placeholder="Enter your name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactEmail">Email</label>
+        <input 
+          type="email"
+          id="contactEmail"
+          name="contactEmail"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactPhone">Phone</label>
+        <input 
+          type="tel"
+          id="contactPhone"
+          name="contactPhone"
+          placeholder="Enter your phone number"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactQuery">Query</label>
+        <textarea 
+          id="contactQuery"
+          name="contactQuery"
+          rows="5"
+          placeholder="How can we help you?"
+          required
+        ></textarea>
+      </div>
+      <button type="submit" class="btn-send">Send</button>
+    </form>
+  </section>
+
+  <!-- Firebase + Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+  <script>
+    /***********************************************************************
+     * FIREBASE CONFIG
+     ***********************************************************************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3OdHh2JhE4z_WxgAO7MZoZWFHm3hfGMQ",
+      authDomain: "aamiribrahimdev.firebaseapp.com",
+      projectId: "aamiribrahimdev",
+      storageBucket: "aamiribrahimdev.firebasestorage.app",
+      messagingSenderId: "205509189691",
+      appId: "1:205509189691:web:77be705b59522b8ac6fc1e",
+      measurementId: "G-VX53J48BSR"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    /***********************************************************************
+     * LOADER HELPERS
+     ***********************************************************************/
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    function showLoader() { loaderOverlay.classList.add('active'); }
+    function hideLoader() { loaderOverlay.classList.remove('active'); }
+
+    /***********************************************************************
+     * COOKIE FUNCTIONS
+     ***********************************************************************/
+    function setCookie(cname, cvalue, exdays=7) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      let expires = "expires="+ d.toUTCString();
+      document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+          return decodeURIComponent(c.substring(name.length, c.length));
+        }
+      }
+      return "";
+    }
+
+    function deleteCookie(cname) {
+      document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    /***********************************************************************
+     * BUILD TOP BAR
+     ***********************************************************************/
+    const topBar = document.getElementById('topBar');
+    function buildTopBar() {
+      const name = getCookie("name");
+      const email = getCookie("email");
+      const uid = getCookie("uid");
+
+      if(!name || !email || !uid) {
+        // Not logged in => show "Login with Google"
+        deleteCookie("name");
+        deleteCookie("email");
+        deleteCookie("uid");
+        topBar.innerHTML = `
+          <button class="login-btn" id="googleLoginBtn2">Login with Google</button>
+        `;
+        const googleLoginBtn2 = document.getElementById('googleLoginBtn2');
+        googleLoginBtn2.addEventListener('click', onGoogleLoginClick);
+      } else {
+        // Logged in => show Logout + Dashboard
+        let dashboardUrl = "dashboard.html";
+        if(email.toLowerCase() === "realak9439@gmail.com") {
+          dashboardUrl = "adminDashboard.html";
+        }
+        topBar.innerHTML = `
+          <button class="logout-btn" id="logoutBtn">Logout</button>
+          <a href="${dashboardUrl}" class="dashboard-btn">Dashboard</a>
+        `;
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+          deleteCookie("name");
+          deleteCookie("email");
+          deleteCookie("uid");
+          location.reload();
+        });
+      }
+    }
+
+    async function onGoogleLoginClick() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const user = result.user;
+        const name = user.displayName || "Anonymous";
+        const email = user.email || "";
+        const uid = user.uid;
+        setCookie("name", name);
+        setCookie("email", email);
+        setCookie("uid", uid);
+
+        // Optionally call /login
+        const payload = { uid, name, email };
+        try {
+          await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+        } catch (err) {
+          console.error("Error calling /login:", err);
+        }
+        location.reload();
+      } catch (error) {
+        console.error("Google login error:", error);
+      }
+    }
+
+    /***********************************************************************
+     * SCROLL TO CALCULATOR
+     ***********************************************************************/
+    const ctaCalculateBtn = document.getElementById('ctaCalculateBtn');
+    const btnCalcPlan = document.getElementById('btnCalcPlan');
+    const pricingCalculatorSection = document.getElementById('pricingCalculator');
+
+    function scrollToCalculator() {
+      pricingCalculatorSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    ctaCalculateBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToCalculator();
+    });
+    btnCalcPlan.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToCalculator();
+    });
+
+    /***********************************************************************
+     * PRICING DATA
+     ***********************************************************************/
+    const pricingData = [
+      {
+        sectionId: 'branding',
+        sectionName: 'Graphic Design & Branding',
+        subsections: [
+          {
+            icon: '🌟',
+            title: 'Logo & Visual Identity Design',
+            subtitle: 'Create a unique and memorable brand image.',
+            price: 220,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🖌',
+            title: 'Brand Guidelines & Style Guides',
+            subtitle: 'Establish a cohesive brand identity.',
+            price: 0,
+            vatPercent: 0,
+            selected: true
+          },
+          {
+            icon: '💼',
+            title: 'Marketing Collateral',
+            subtitle: '(Brochures, Flyers, Business Cards)',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🌐',
+            title: 'Social Media & Digital Marketing Assets',
+            subtitle: 'Eye-catching graphics for social campaigns.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '📊',
+            title: 'Presentation & Pitch Deck Design – Stand out with engaging and persuasive presentations templates kit.',
+            subtitle: 'Stand out with engaging and persuasive presentaion templates kit',
+            price: 300,
+            vatPercent: 0,
+            selected: false
+          },
+        ]
+      },
+      {
+        sectionId: 'uiux',
+        sectionName: 'UI/UX Design & Product Strategy',
+        subsections: [
+          {
+            icon: '🔍',
+            title: 'User Research & Usability Testing',
+            subtitle: 'Optimize user experience via data.',
+            price: 180,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🗜',
+            title: 'Wireframing & Prototyping',
+            subtitle: 'Transform ideas into intuitive digital interfaces.',
+            price: 150,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🎨',
+            title: 'Design System Creation',
+            subtitle: 'Build scalable, consistent design assets.',
+            price: 100,
+            vatPercent: 0,
+            selected: true
+          },
+          {
+            icon: '📊',
+            title: 'Information Architecture & UX Strategy',
+            subtitle: 'Improve user journeys and structure.',
+            price: 90,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '💡',
+            title: 'Conversion Rate Optimization (CRO)',
+            subtitle: 'Design for higher engagement/sales.',
+            price: 100,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '📱',
+            title: 'Mobile & Web App UX/UI Design',
+            subtitle: 'Modern and responsive designs.',
+            price: 500,
+            vatPercent: 0,
+            selected: true
+          },
+          {
+            icon: '🛍️',
+            title: 'E-commerce UX/UI Strategy & Optimization – Enhance online shopping experiences.',
+            subtitle: 'Enhance online shopping',
+            price: 500,
+            vatPercent: 0,
+            selected: true
+          },
+          {
+            icon: '🔎',
+            title: 'UX Audits & Heuristic Evaluations – Identify and fix usability issues.',
+            subtitle: 'Hastle free audits',
+            price: 100,
+            vatPercent: 0,
+            selected: true
+          },
+        ]
+      },
+      {
+        sectionId: 'corporate',
+        sectionName: 'Corporate Profile & Business Collateral',
+        subsections: [
+          {
+            icon: '🏢',
+            title: 'Company Corporate Profile Design',
+            subtitle: 'Showcase your business professionally.',
+            price: 400,
+            vatPercent: 0,
+            selected: true
+          },
+          {
+            icon: '📄',
+            title: 'Annual Reports & Business Documentation',
+            subtitle: 'Visually appealing, well-structured reports.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '📑',
+            title: 'Profression Proposals & Whitepapers',
+            subtitle: 'Impactful business documentation.',
+            price: 0,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '📊',
+            title: 'Infographics & Data Visualization',
+            subtitle: 'Simplify data into visually appealing graphics.',
+            price: 320,
+            vatPercent: 0,
+            selected: false
+          },
+        ]
+      },
+      {
+        sectionId: 'digital',
+        sectionName: 'Digital Growth & Consulting',
+        subsections: [
+          {
+            icon: '🤝',
+            title: 'Stakeholder & Developer Collaboration',
+            subtitle: 'Seamless design-to-dev handoff.',
+            price: 30,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '⚙️',
+            title: 'Interactive & Micro-Interaction Design',
+            subtitle: 'Engaging animations for better UX.',
+            price: 220,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '✍️',
+            title: 'UX Writing & Content Strategy',
+            subtitle: 'Clear, concise digital communication.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🚀',
+            title: 'Webflow & No-Code UI Consulting',
+            subtitle: 'Build and launch websites without coding.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '🎯',
+            title: 'Design Thinking Workshops & Training',
+            subtitle: 'Educate teams on UX best practices.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+          {
+            icon: '📂',
+            title: 'Portfolio & Case Study Development for Designers – Strengthen your professional presence.',
+            subtitle: 'Educate teams on UX best practices.',
+            price: 0,
+            vatPercent: 0,
+            selected: false
+          },
+        ]
+      },
+    ];
+
+    const tabsContainer = document.getElementById('tabsContainer');
+    const tabIndicator = document.querySelector('.tab-indicator');
+    const calculatorSectionEl = document.querySelector('.pricing-calculator');
+    let activeTabIndex = 0;
+
+    function renderTabs() {
+      tabsContainer.querySelectorAll('.tab').forEach(t => t.remove());
+      pricingData.forEach((section, i) => {
+        const tabDiv = document.createElement('div');
+        tabDiv.classList.add('tab');
+        if(i === activeTabIndex) {
+          tabDiv.classList.add('active');
+        }
+        tabDiv.setAttribute('data-index', i.toString());
+        tabDiv.innerText = section.sectionName;
+        tabsContainer.appendChild(tabDiv);
+      });
+      tabsContainer.appendChild(tabIndicator);
+    }
+
+    function renderCalculatorBodies() {
+      calculatorSectionEl.querySelectorAll('.calculator-body').forEach(b => b.remove());
+      pricingData.forEach((section, sIndex) => {
+        const bodyDiv = document.createElement('div');
+        bodyDiv.classList.add('calculator-body');
+        if(sIndex === activeTabIndex) {
+          bodyDiv.classList.add('active-body');
+        }
+        bodyDiv.id = section.sectionId;
+
+        let serviceHtml = '';
+        section.subsections.forEach((sub, subIndex) => {
+          const checked = sub.selected ? 'checked' : '';
+          const inputId = `${section.sectionId}-chk-${subIndex}`;
+          serviceHtml += `
+            <div class="service-item">
+              <div class="toggle-switch">
+                <input type="checkbox" id="${inputId}" data-section="${section.sectionId}" data-subindex="${subIndex}" ${checked}/>
+                <label for="${inputId}"></label>
+              </div>
+              <div class="service-info">
+                <h3>${sub.icon} ${sub.title}</h3>
+                <p>${sub.subtitle}</p>
+              </div>
+              <div class="service-price">
+                ${sub.price} AED
+                <span class="vat">@ ${sub.vatPercent}% VAT</span>
+              </div>
+            </div>
+          `;
+        });
+
+        const bodyInner = `
+          <div class="service-items">
+            ${serviceHtml}
+          </div>
+          <div class="investment-area">
+            <h3>${section.sectionName} Subtotal</h3>
+            <p>This reflects only the sum of selected items in this section.</p>
+            <div class="investment-price" id="${section.sectionId}-subtotal">0 AED<br>@ VAT</div>
+          </div>
+        `;
+        bodyDiv.innerHTML = bodyInner;
+
+        const advancedEl = document.getElementById('advancedOnlySection');
+        calculatorSectionEl.insertBefore(bodyDiv, advancedEl);
+      });
+    }
+
+    function positionTabIndicator() {
+      // Not animating the tab indicator in this example
+    }
+
+    function setActiveTab(i) {
+      activeTabIndex = i;
+      tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tabsContainer.querySelector(`.tab[data-index='${i}']`).classList.add('active');
+      calculatorSectionEl.querySelectorAll('.calculator-body').forEach((body, idx) => {
+        body.classList.remove('active-body');
+        if(idx === i) body.classList.add('active-body');
+      });
+      updateAllSubtotals();
+      updateGrandTotal();
+    }
+
+    function updateAllSubtotals() {
+      pricingData.forEach(section => {
+        let sum = 0;
+        section.subsections.forEach(sub => {
+          if(sub.selected) {
+            const vatAmount = (sub.price * sub.vatPercent) / 100;
+            sum += sub.price + vatAmount;
+          }
+        });
+        const subEl = document.getElementById(section.sectionId + '-subtotal');
+        if(subEl) {
+          subEl.innerHTML = `${sum.toFixed(2)} AED<br>@ VAT`;
+        }
+      });
+    }
+
+    function updateGrandTotal() {
+      let total = 0;
+      pricingData.forEach(s => {
+        s.subsections.forEach(sub => {
+          if(sub.selected) {
+            const vat = (sub.price * sub.vatPercent)/100;
+            total += (sub.price + vat);
+          }
+        });
+      });
+      // Add advanced items if toggled
+    
+      // Urgency checkboxes do not have an extra cost in this example, so skip cost. 
+      // If you need them to add cost, do so here.
+
+      document.getElementById('grandTotalAmt').textContent = `${total.toFixed(2)} AED`;
+    }
+
+    function onCheckboxChange(e) {
+      const input = e.target;
+      if(input.type === 'checkbox') {
+        const sid = input.getAttribute('data-section');
+        const subIdx = parseInt(input.getAttribute('data-subindex'), 10);
+        if(!sid) return;
+        const sec = pricingData.find(x => x.sectionId === sid);
+        if(!sec) return;
+        sec.subsections[subIdx].selected = input.checked;
+        updateAllSubtotals();
+        updateGrandTotal();
+      }
+    }
+
+    /***********************************************************************
+     * ADVANCED MODE
+     ***********************************************************************/
+    const advancedSectionEl = document.getElementById('advancedOnlySection');
+    const urgencyOptionsEl = document.getElementById('urgencyOptions');
+    const toggleMode2 = document.getElementById('toggleMode2');
+    toggleMode2.addEventListener('change', () => {
+      const advOn = toggleMode2.checked;
+      if(advOn) {
+        advancedSectionEl.classList.add('visible');
+        urgencyOptionsEl.classList.add('visible');
+      } else {
+        advancedSectionEl.classList.remove('visible');
+        urgencyOptionsEl.classList.remove('visible');
+      }
+      updateGrandTotal();
+    });
+
+    advancedSectionEl.addEventListener('change', (e) => {
+      if(e.target.type === 'checkbox') {
+        updateGrandTotal();
+      }
+    });
+
+    urgencyOptionsEl.addEventListener('change', (e) => {
+      if(e.target.type === 'checkbox') {
+        // If you want changes in total, handle it here
+        updateGrandTotal();
+      }
+    });
+
+    /***********************************************************************
+     * "GET STARTED" => /createProject
+     ***********************************************************************/
+    const getStartedBtn = document.getElementById('getStartedBtn');
+    getStartedBtn.addEventListener('click', async (evt) => {
+      evt.preventDefault();
+      const name = getCookie("name");
+      const email = getCookie("email");
+      const uid = getCookie("uid");
+      if(!name || !email || !uid) {
+        onGoogleLoginClick();
+        return;
+      }
+
+      showLoader();
+      try {
+        // Build final JSON
+        const finalSections = pricingData.map(sec => {
+          const selectedSubs = sec.subsections
+            .filter(x => x.selected)
+            .map(x => ({
+              title: x.title,
+              subtitle: x.subtitle,
+              price: x.price,
+              vatPercent: x.vatPercent
+            }));
+          return {
+            sectionName: sec.sectionName,
+            subsections: selectedSubs
+          };
+        });
+
+        // Possibly add advanced items
+        const advOn = toggleMode2.checked;
+        let advItems = [];
+        
+        if(advItems.length > 0) {
+          finalSections.push({
+            sectionName: "Advanced Add-Ons",
+            subsections: advItems
+          });
+        }
+
+        // Urgency checkboxes
+        let urgencyItems = [];
+        if(document.getElementById('urgencyNoHustle').checked) {
+          urgencyItems.push({
+            title: "No Hustal",
+            subtitle: "Take your time but I need something nice.",
+            price: 0,
+            vatPercent: 0
+          });
+        }
+        if(document.getElementById('urgencyASAP').checked) {
+          urgencyItems.push({
+            title: "ASAP",
+            subtitle: "Within 15 Days",
+            price: 0,
+            vatPercent: 0
+          });
+        }
+        if(document.getElementById('urgencyUrget').checked) {
+          urgencyItems.push({
+            title: "Urget",
+            subtitle: "Within 7 Days",
+            price: 0,
+            vatPercent: 0
+          });
+        }
+        if(document.getElementById('urgencySuper').checked) {
+          urgencyItems.push({
+            title: "Super Urgent",
+            subtitle: "Within 3 working days",
+            price: 0,
+            vatPercent: 0
+          });
+        }
+        if(urgencyItems.length > 0) {
+          finalSections.push({
+            sectionName: "Urgency Options",
+            subsections: urgencyItems
+          });
+        }
+
+        const payload = {
+          uid,
+          name,
+          email,
+          sections: finalSections
+        };
+        console.log("Sending final JSON to /createProject:", payload);
+
+        // Example call
+        const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/createProject", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        console.log("Response from createProject:", data);
+
+        alert("Success! Check console for details.");
+      } catch(e) {
+        console.error("Error sending final data:", e);
+        alert("Error sending data. See console.");
+      } finally {
+        hideLoader();
+      }
+    });
+
+    /***********************************************************************
+     * CONTACT FORM => /sendContact
+     ***********************************************************************/
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      showLoader();
+      try {
+        const name = document.getElementById('contactName').value;
+        const email = document.getElementById('contactEmail').value;
+        const phone = document.getElementById('contactPhone').value;
+        const query = document.getElementById('contactQuery').value;
+
+        const payload = { name, email, phone, message: query };
+
+        const resp = await fetch("https://us-central1-YOUR_PROJECT.cloudfunctions.net/api/sendContact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await resp.json();
+        console.log("Response from /sendContact:", result);
+
+        alert("Message sent! We'll be in touch soon.");
+        contactForm.reset();
+      } catch(e) {
+        console.error("Error sending contact form:", e);
+        alert("Failed to send. Check console.");
+      } finally {
+        hideLoader();
+      }
+    });
+
+    /***********************************************************************
+     * PAGE LOAD
+     ***********************************************************************/
+    window.addEventListener('load', () => {
+      buildTopBar();
+      renderTabs();
+      renderCalculatorBodies();
+      setActiveTab(0);
+      positionTabIndicator();
+
+      // Listen for tab clicks
+      tabsContainer.addEventListener('click', (evt) => {
+        if(evt.target.classList.contains('tab')) {
+          const idx = parseInt(evt.target.getAttribute('data-index'), 10);
+          setActiveTab(idx);
+        }
+      });
+
+      // Listen for service item toggles
+      calculatorSectionEl.addEventListener('change', onCheckboxChange);
+
+      // Initialize totals
+      updateAllSubtotals();
+      updateGrandTotal();
+    });
+
+    window.addEventListener('resize', positionTabIndicator);
+  </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice</title>
+  <style>
+    /* Basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      width: 100%;
+      max-width: 800px; /* helps ensure it fits neatly on A4 when printed */
+      margin: 20px auto;
+      padding: 50px;
+    }
+
+    /* Company Title and Top Header Line */
+    .company-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    /* Adjust the logo as needed */
+    .logo {
+      width: 40px;
+      height: auto;
+    }
+
+    .company-name {
+      font-size: 1.5rem;
+      color: #262257; /* new bluish color */
+      font-weight: bold;
+    }
+
+    .header-line {
+      width: 100%;
+      height: 4px; /* adjust thickness as needed */
+      background-color: #262257;
+      margin-bottom: 10px;
+    }
+
+    /* Invoice Number (placed right below the line, on the right) */
+    .invoice-number {
+      text-align: right;
+      font-size: 1rem;
+      margin-bottom: 10px; /* slightly tighter for the new date line */
+    }
+
+    /* Date line below Invoice Number */
+    .invoice-date {
+      text-align: right;
+      font-size: 1rem;
+      margin-bottom: 50px; 
+    }
+
+    /* Provider and Client Sections */
+    .info-sections {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    /* Slight vertical line before Service Provider */
+    .vertical-line {
+      border-left: 1px solid #ccc;
+      margin: 0 20px; /* spacing around the divider */
+    }
+
+    .info-box {
+      width: 45%;
+      line-height:2.5;
+      padding: 10px;
+    }
+
+    /* For aligning text in each info-box using a small table */
+    .info-table {
+      margin-top: 5px;   /* small spacing below the "Client Details"/"Service Provider" heading */
+      border-collapse: collapse;
+    }
+
+    .info-table td {
+      padding: 2px 5px 2px 0;
+      vertical-align: top;
+    }
+    .info-table td:first-child {
+      white-space: nowrap;
+      font-weight: bold;
+    }
+
+    h2 {
+
+      text-align: center;
+      margin: 50px 0;
+    }
+
+    /* Table styling (invoice items) */
+    table {
+      margin-top:30px;
+      padding: 15px;
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table thead th {
+      background: #262257;
+      color:white;
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+    table tbody td {
+      padding: 15px;
+      border-bottom: 1px solid #ccc;
+    }
+    /* The final total row */
+    tfoot td {
+      border: none;
+      font-weight: bold;
+      padding: 10px;
+    }
+
+    /* Bank details */
+    .bank-details {
+      margin-top: 100px;
+      margin-bottom: 200px;
+      line-height: 2.5;
+    }
+
+    /* Same table alignment for bank details */
+    .bank-table {
+      margin-top: 5px;
+      border-collapse: collapse;
+    }
+    .bank-table td {
+      padding: 2px 5px 2px 0;
+      vertical-align: top;
+    }
+    .bank-table td:first-child {
+      white-space: nowrap;
+      font-weight: bold;
+    }
+
+    /* Footer Thank You and line */
+    .footer-thankyou {
+      margin-top: 40px;
+      margin-bottom: 5px;
+      font-size: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+    .footer-line {
+      width: 100%;
+      height: 4px;
+      background-color: #262257;
+      margin-bottom: 10px;
+    }
+    .blueheader {
+        color: white;
+        background-color: #262257;
+        font-weight: bold;
+        padding:5px;
+    }
+    /* Footer note */
+    footer {
+      font-size: 0.85rem;
+      text-align: center;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Company Name & Logo -->
+  <div class="company-title">
+    <!-- Replace with your actual logo path or data URI -->
+    <img class="logo" src="data:image/png;base64,"/>
+    <div class="company-name">{invoice.serviceProvider.name}</div>
+  </div>
+  <div class="header-line"></div>
+
+  <!-- Invoice Number -->
+  <div class="invoice-number">
+    <strong>Invoice #</strong> {invoice.invoiceNumber}
+  </div>
+
+  <!-- Invoice Date -->
+  <div class="invoice-date">
+    <strong>Date:</strong> {invoice.invoiceDate}
+  </div>
+
+  <!-- Provider and Client Info Sections -->
+  <div class="info-sections">
+    <!-- Client Section -->
+    <div class="info-box">
+      <strong class="blueheader">Client Details:</strong>
+      <table class="info-table">
+        <tr>
+          <td>Organization:</td>
+          <td>{invoice.client.name}</td>
+        </tr>
+        
+      
+        <tr>
+          <td>Email:</td>
+          <td>{invoice.client.email}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Slight vertical divider -->
+    <div class="vertical-line"></div>
+
+    <!-- Service Provider Section -->
+    <div class="info-box">
+      <strong class="blueheader">Service Provider:</strong>
+      <table class="info-table">
+        <tr>
+          <td>Organization:</td>
+          <td>Design On Demand</td>
+        </tr>
+        <tr>
+          <td>Email:</td>
+          <td>design@gmail.com</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Invoice Title -->
+  <h2>Invoice for {invoice.invoiceProject}</h2>
+
+  <!-- Invoice Table -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 10%;">S.NO</th>
+        <th style="width: 40%;">Service</th>
+        <th style="width: 15%;">Amount ({invoice.currency})</th>
+        <th style="width: 15%;">VAT %</th>
+        <th style="width: 20%;">Total ({invoice.currency})</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <!-- More rows as needed -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align: right;">Total</td>
+        <td>{invoice.total}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- Bank Details -->
+  <div class="bank-details">
+    <strong class="blueheader">Payment Details</strong>
+    <table class="bank-table">
+      <tr>
+        <td>BANK NAME:</td>
+        <td>Lehman Brothers</td>
+      </tr>
+      <tr>
+        <td>Branch:</td>
+        <td>New York Branch</td>
+      </tr>
+      
+      <tr>
+        <td>Branch Code:</td>
+        <td>42522</td>
+      </tr>
+      <tr>
+        <td>Swift Code:</td>
+        <td>WI249294</td>
+      </tr>
+      <tr>
+        <td>Account Name:</td>
+        <td>Design on Demand Ltd</td>
+      </tr>
+      <tr>
+        <td>Account No:</td>
+        <td>9942949249</td>
+      </tr>
+      <tr>
+
+        <td>IBAN:</td>
+        <td>PK394924924</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Thank You + Footer Line -->
+  <div class="footer-thankyou">
+    Thank you for choosing <i><u>{invoice.serviceProvider.name}</u></i>
+  </div>
+  <div class="footer-line"></div>
+
+  <!-- Footer -->
+  <footer>
+    This is a computer generated invoice that does not require any signature or stamp.
+    For any queries, please reach out at <strong>{invoice.email}</strong>
+  </footer>
+
+</body>
+</html>

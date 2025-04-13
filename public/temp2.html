@@ -1,0 +1,1305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DesignOnDemand Landing</title>
+  <style>
+    /* BASIC RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* GLOBAL PAGE STYLES */
+    html, body {
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-color: #3B0AFF; /* Purple background */
+      color: #fff;
+      overflow-x: hidden; 
+    }
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+
+    /* LOADER (Overlay) */
+    .loader-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid #fff;
+      border-top: 8px solid #3B0AFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* TOP BAR FOR GOOGLE LOGIN / LOGOUT / DASHBOARD */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 1rem;
+      background-color: rgba(0,0,0,0.1);
+      gap: 1rem;
+    }
+    .login-btn, .logout-btn, .dashboard-btn {
+      background-color: transparent;
+      border: 2px solid #FFF;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .login-btn:hover,
+    .logout-btn:hover,
+    .dashboard-btn:hover {
+      background-color: #FFF;
+      color: #3B0AFF;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      min-height: 80vh; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 4rem;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+    .hero .cta-btn {
+      display: inline-block;
+      color: #FFF;
+      border: 2px solid #FFF;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .hero .cta-btn:hover {
+      background-color: #FFF; 
+      color: #3B0AFF;
+    }
+
+    /* WHY CHOOSE SECTION */
+    .why-choose {
+      width: 100%;
+      padding: 4rem 2rem;
+    }
+    .why-choose-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .why-left {
+      flex: 1;
+      margin-right: 2rem;
+      margin-left: 1rem; /* slight indentation */
+    }
+    .why-left h2 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      max-width: 400px;
+    }
+    .why-right {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      margin-left: 2rem; 
+    }
+    .reason h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .reason p {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: #EFEFEF;
+    }
+
+    /* OUR SERVICES */
+    .services {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .services h2 {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 3rem;
+      column-gap: 2rem;
+      margin-bottom: 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .service-card {
+      text-align: left;
+      padding: 0 1rem;
+    }
+    .service-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .service-card ul {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      line-height: 1.6;
+    }
+    .services-button {
+      text-align: center;
+    }
+    .services-button .btn-calc {
+      display: inline-block;
+      color: #FFF;
+      border: 2px solid #FFF;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .services-button .btn-calc:hover {
+      background-color: #FFF;
+      color: #3B0AFF;
+    }
+
+    /* PRICING CALCULATOR */
+    .pricing-calculator {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .pricing-calculator h2 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .pricing-calculator .subheading {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .pricing-calculator .desc {
+      text-align: center;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 2rem;
+      color: #EFEFEF;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .tabs {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .tab {
+      background-color: transparent;
+      border: 2px solid #FFF;
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      position: relative; 
+      z-index: 1; 
+      white-space: nowrap; 
+    }
+    .tab.active {
+      color: #3B0AFF;
+      font-weight: 600;
+    }
+    .tab:hover {
+      background-color: #FFF;
+      color: #3B0AFF;
+    }
+    .tab-indicator {
+      position: absolute;
+      top: 0; 
+      left: 0;
+      height: 100%;
+      background-color: #00D76A; 
+      border-radius: 20px;
+      z-index: 0; 
+      transition: 0.4s ease; 
+    }
+    .calculator-body {
+      display: none; 
+      margin-bottom: 2rem;
+    }
+    .calculator-body.active-body {
+      display: block;
+    }
+
+    /* Toggle for sub-service */
+    .service-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+    }
+    .service-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+    .toggle-switch input {
+      display: none;
+    }
+    .toggle-switch label {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-color: #ccc;
+      border-radius: 34px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.4s;
+    }
+    .toggle-switch label::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.4s;
+    }
+    .toggle-switch input:checked + label {
+      background-color: #00D76A;
+    }
+    .toggle-switch input:checked + label::before {
+      transform: translateX(26px);
+    }
+
+    .service-info {
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .service-info h3 {
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .service-info p {
+      font-size: 0.9rem;
+      color: #EFEFEF;
+    }
+    .service-price {
+      min-width: 80px;
+      text-align: right;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .investment-area {
+      margin-bottom: 2rem;
+    }
+    .investment-area h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .investment-area p {
+      font-size: 0.9rem;
+      color: #EFEFEF;
+      margin-bottom: 1rem;
+    }
+    .investment-price {
+      text-align: right;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .normal-advance-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .grand-total {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .grand-total .amount {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .grand-total .label {
+      font-size: 1rem;
+      color: #EFEFEF;
+      margin-bottom: 2rem;
+    }
+    .grand-total .btn-get-started {
+      display: inline-block;
+      color: #FFF;
+      border: 2px solid #FFF;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .grand-total .btn-get-started:hover {
+      background-color: #FFF;
+      color: #3B0AFF;
+    }
+
+    /* CONTACT US */
+    .contact-us {
+      padding: 4rem 2rem;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .contact-us h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .contact-us p {
+      font-size: 1rem;
+      color: #EFEFEF;
+      margin-bottom: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group textarea {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      color: #333;
+    }
+    .btn-send {
+      align-self: flex-end;
+      color: #FFF;
+      border: 2px solid #FFF;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.3s, color 0.3s;
+      background: transparent;
+      cursor: pointer;
+    }
+    .btn-send:hover {
+      background-color: #FFF;
+      color: #3B0AFF;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .top-bar {
+        justify-content: center;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      .why-choose-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .why-left, .why-right {
+        margin-left: 0 !important;
+      }
+      .why-left {
+        margin-bottom: 2rem;
+      }
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+      .tabs {
+        flex-direction: column;
+        align-items: center;
+      }
+      .service-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .service-price {
+        margin-top: 0.5rem;
+        text-align: left;
+      }
+      .normal-advance-toggle {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADER OVERLAY -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- TOP BAR FOR GOOGLE LOGIN / LOGOUT / DASHBOARD -->
+  <div class="top-bar" id="topBar">
+    <!-- We will dynamically insert either "Login with Google" or "Logout & Dashboard" here -->
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <h1>Premium Design Services</h1>
+    <a href="#" class="cta-btn" id="calcNowBtn">CALCULATE NOW</a>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="why-choose">
+    <div class="why-choose-wrapper">
+      <div class="why-left">
+        <h2>Why Choose<br/>DesignOnDemand?</h2>
+      </div>
+      <div class="why-right">
+        <div class="reason">
+          <h3><span class="emoji">🎯</span> Flat-Rate Monthly Packages</h3>
+          <p>No hidden costs, just premium design work on demand.</p>
+        </div>
+        <div class="reason">
+          <h3><span class="emoji">🚀</span> Fast Turnaround & Unlimited Revisions</h3>
+          <p>Get your designs quickly with unlimited revisions to match your vision.</p>
+        </div>
+        <div class="reason">
+          <h3><span class="emoji">💼</span> Expert Designers at Your Fingertips</h3>
+          <p>Over 12+ years of experience in UI/UX, branding, and corporate design.</p>
+        </div>
+        <div class="reason">
+          <h3><span class="emoji">🌐</span> 100% Remote & Flexible</h3>
+          <p>Work with us from anywhere, anytime.</p>
+        </div>
+        <div class="reason">
+          <h3><span class="emoji">💳</span> Pay Online & Manage Easily</h3>
+          <p>Select services, pay securely, and track your requests.</p>
+        </div>
+        <div class="reason">
+          <h3><span class="emoji">📌</span> Perfect for</h3>
+          <p>Startups, SMEs, Agencies, and Enterprises looking for professional design 
+             without hiring a full-time designer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR SERVICES -->
+  <section class="services">
+    <h2>Our Services</h2>
+    <div class="services-grid">
+      <!-- Example Service Cards -->
+      <div class="service-card">
+        <h3><span class="emoji">🔥</span> UI/UX Design & Digital Product Strategy</h3>
+        <ul>
+          <li>Website & Mobile App UI/UX</li>
+          <li>SaaS Platform & Dashboard Design</li>
+          <li>Wireframing & Prototyping</li>
+          <li>Design System Creation</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🎨</span> Branding & Visual Identity</h3>
+        <ul>
+          <li>Logo Design & Brand Guidelines</li>
+          <li>Corporate Stationery & Business Cards</li>
+          <li>Marketing & Social Media Graphics</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">📄</span> Corporate & Business Design</h3>
+        <ul>
+          <li>Company Profile & Pitch Decks</li>
+          <li>Brochures, Flyers & Digital Ads</li>
+          <li>Infographics & Presentation Design</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🎨</span> Branding & Visual Identity</h3>
+        <ul>
+          <li>Logo Design & Brand Guidelines</li>
+          <li>Corporate Stationery & Business Cards</li>
+          <li>Marketing & Social Media Graphics</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">📄</span> Corporate & Business Design</h3>
+        <ul>
+          <li>Company Profile & Pitch Decks</li>
+          <li>Brochures, Flyers & Digital Ads</li>
+          <li>Infographics & Presentation Design</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3><span class="emoji">🔥</span> UI/UX Design & Digital Product Strategy</h3>
+        <ul>
+          <li>Website & Mobile App UI/UX</li>
+          <li>SaaS Platform & Dashboard Design</li>
+          <li>Wireframing & Prototyping</li>
+          <li>Design System Creation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="services-button">
+      <a href="#" class="btn-calc" id="btnCalcPlan">CALCULATE MY PLAN</a>
+    </div>
+  </section>
+
+  <!-- PRICING CALCULATOR -->
+  <section class="pricing-calculator" id="pricingCalculator">
+    <h2>Pricing Calculator</h2>
+    <p class="subheading">💰 Instant Pricing Calculator – Get a Quote in Seconds!</p>
+    <p class="desc">
+      Users can select their desired services, choose a turnaround time, and see a transparent 
+      cost breakdown before paying online.
+    </p>
+
+    <div class="tabs" id="tabsContainer">
+      <div class="tab-indicator"></div>
+    </div>
+
+    <div class="normal-advance-toggle">
+      <h4>Normal</h4>
+      <div class="toggle-switch">
+        <input type="checkbox" id="toggleMode">
+        <label for="toggleMode"></label>
+      </div>
+      <h4>Advance</h4>
+    </div>
+    <div class="grand-total">
+      <div class="amount" id="grandTotalAmt">0.00 AED</div>
+      <div class="label">Grand Total</div>
+      <a href="#" class="btn-get-started" id="getStartedBtn">Get Started</a>
+    </div>
+  </section>
+
+  <!-- CONTACT US -->
+  <section class="contact-us">
+    <h2>Contact Us</h2>
+    <p>Need something specific or want to speak to an expert? Fill out the form below and we’ll get in touch soon!</p>
+    <form class="contact-form" id="contactForm">
+      <div class="form-group">
+        <label for="contactName">Name</label>
+        <input 
+          type="text"
+          id="contactName"
+          name="contactName"
+          placeholder="Enter your name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactEmail">Email</label>
+        <input 
+          type="email"
+          id="contactEmail"
+          name="contactEmail"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactPhone">Phone</label>
+        <input 
+          type="tel"
+          id="contactPhone"
+          name="contactPhone"
+          placeholder="Enter your phone number"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="contactQuery">Query</label>
+        <textarea 
+          id="contactQuery"
+          name="contactQuery"
+          rows="5"
+          placeholder="How can we help you?"
+          required
+        ></textarea>
+      </div>
+      <button type="submit" class="btn-send">Send</button>
+    </form>
+  </section>
+
+  <!-- Firebase + Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+
+  <script>
+    /***********************************************************************
+     * 1) FIREBASE CONFIG
+     ***********************************************************************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3OdHh2JhE4z_WxgAO7MZoZWFHm3hfGMQ",
+      authDomain: "aamiribrahimdev.firebaseapp.com",
+      projectId: "aamiribrahimdev",
+      storageBucket: "aamiribrahimdev.firebasestorage.app",
+      messagingSenderId: "205509189691",
+      appId: "1:205509189691:web:77be705b59522b8ac6fc1e",
+      measurementId: "G-VX53J48BSR"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    /***********************************************************************
+     * 2) LOADER HELPERS
+     ***********************************************************************/
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    function showLoader() { loaderOverlay.classList.add('active'); }
+    function hideLoader() { loaderOverlay.classList.remove('active'); }
+
+    /***********************************************************************
+     * 3) COOKIE FUNCTIONS
+     ***********************************************************************/
+    function setCookie(cname, cvalue, exdays=7) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      let expires = "expires="+ d.toUTCString();
+      document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+          return decodeURIComponent(c.substring(name.length, c.length));
+        }
+      }
+      return "";
+    }
+
+    function deleteCookie(cname) {
+      document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    /***********************************************************************
+     * 4) CHECK LOGIN STATUS VIA COOKIES & BUILD TOP BAR
+     ***********************************************************************/
+    const topBar = document.getElementById('topBar');
+
+    function buildTopBar() {
+      const name = getCookie("name");
+      const email = getCookie("email");
+      const uid = getCookie("uid");
+
+      // Check if any is missing -> delete them all
+      if(!name || !email || !uid) {
+        // Not logged in -> remove partial cookies
+        deleteCookie("name");
+        deleteCookie("email");
+        deleteCookie("uid");
+
+        // Show "Login with Google" button
+        topBar.innerHTML = `
+          <button class="login-btn" id="googleLoginBtn2">Login with Google</button>
+        `;
+
+        // We re-attach an event for that new button
+        const googleLoginBtn2 = document.getElementById('googleLoginBtn2');
+        googleLoginBtn2.addEventListener('click', onGoogleLoginClick);
+      } else {
+        // Logged in -> show "Logout" + "Dashboard"
+        let dashboardUrl = "dashboard.html";
+        if(email.toLowerCase() === "realak9439@gmail.com") {
+          dashboardUrl = "admindashboard.html";
+        }
+        topBar.innerHTML = `
+          <button class="logout-btn" id="logoutBtn">Logout</button>
+          <a href="${dashboardUrl}" class="dashboard-btn">Dashboard</a>
+        `;
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+          deleteCookie("name");
+          deleteCookie("email");
+          deleteCookie("uid");
+          location.reload();
+        });
+      }
+    }
+
+    function onGoogleLoginClick() {
+      // We do not show loader per your request
+      // sign in with google, set cookies, call /login
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider)
+        .then(async (result) => {
+          const user = result.user;
+          const name = user.displayName || "Anonymous";
+          const email = user.email || "";
+          const uid = user.uid;
+
+          setCookie("name", name);
+          setCookie("email", email);
+          setCookie("uid", uid);
+
+          // Call /login with {uid, name, email} (no loader needed)
+          const payload = { uid, name, email };
+          console.log("Calling /login with", payload);
+          try {
+            await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+          } catch (err) {
+            console.error("Error calling /login:", err);
+          }
+
+          // Reload page to update top bar
+          location.reload();
+        })
+        .catch((error) => {
+          console.error("Google login error:", error);
+        });
+    }
+
+    /***********************************************************************
+     * 5) "CALCULATE NOW" & "CALCULATE MY PLAN" SCROLL INTO VIEW
+     ***********************************************************************/
+    const calcNowBtn = document.getElementById('calcNowBtn');
+    const btnCalcPlan = document.getElementById('btnCalcPlan');
+    const pricingCalculatorSection = document.getElementById('pricingCalculator');
+
+    function scrollToCalculator() {
+      pricingCalculatorSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    calcNowBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToCalculator();
+    });
+    btnCalcPlan.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollToCalculator();
+    });
+
+    /***********************************************************************
+     * 6) PRICING DATA
+     ***********************************************************************/
+     const pricingData = [
+      {
+        sectionId: 'branding',
+        sectionName: 'Graphic Design & Branding',
+        subsections: [
+          {
+            icon: '🌟',
+            title: 'Logo & Visual Identity Design',
+            subtitle: 'Create a unique and memorable brand image.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🖌',
+            title: 'Brand Guidelines & Style Guides',
+            subtitle: 'Establish a cohesive brand identity.',
+            price: 100,
+            vatPercent: 5,
+            selected: true
+          },
+          {
+            icon: '💼',
+            title: 'Marketing Collateral',
+            subtitle: '(Brochures, Flyers, Business Cards)',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🌐',
+            title: 'Social Media & Digital Marketing Assets',
+            subtitle: 'Eye-catching graphics for social campaigns.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+        ]
+      },
+      {
+        sectionId: 'uiux',
+        sectionName: 'UI/UX Design & Product Strategy',
+        subsections: [
+          {
+            icon: '🔍',
+            title: 'User Research & Usability Testing',
+            subtitle: 'Optimize user experience via data.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🗜',
+            title: 'Wireframing & Prototyping',
+            subtitle: 'Transform ideas into intuitive digital interfaces.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🎨',
+            title: 'Design System Creation',
+            subtitle: 'Build scalable, consistent design assets.',
+            price: 100,
+            vatPercent: 5,
+            selected: true
+          },
+          {
+            icon: '📊',
+            title: 'Information Architecture & UX Strategy',
+            subtitle: 'Improve user journeys and structure.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '💡',
+            title: 'Conversion Rate Optimization (CRO)',
+            subtitle: 'Design for higher engagement/sales.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '📱',
+            title: 'Mobile & Web App UX/UI Design',
+            subtitle: 'Modern and responsive designs.',
+            price: 100,
+            vatPercent: 5,
+            selected: true
+          },
+        ]
+      },
+      {
+        sectionId: 'corporate',
+        sectionName: 'Corporate Profile & Business Collateral',
+        subsections: [
+          {
+            icon: '🏢',
+            title: 'Company Corporate Profile Design',
+            subtitle: 'Showcase your business professionally.',
+            price: 100,
+            vatPercent: 5,
+            selected: true
+          },
+          {
+            icon: '📄',
+            title: 'Annual Reports & Business Documentation',
+            subtitle: 'Visually appealing, well-structured reports.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '📑',
+            title: 'Proposals & Whitepapers',
+            subtitle: 'Impactful business documentation.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '📊',
+            title: 'Infographics & Data Visualization',
+            subtitle: 'Simplify data into visually appealing graphics.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+        ]
+      },
+      {
+        sectionId: 'digital',
+        sectionName: 'Digital Growth & Consulting',
+        subsections: [
+          {
+            icon: '🤝',
+            title: 'Stakeholder & Developer Collaboration',
+            subtitle: 'Seamless design-to-dev handoff.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '⚙️',
+            title: 'Interactive & Micro-Interaction Design',
+            subtitle: 'Engaging animations for better UX.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '✍️',
+            title: 'UX Writing & Content Strategy',
+            subtitle: 'Clear, concise digital communication.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🚀',
+            title: 'Webflow & No-Code UI Consulting',
+            subtitle: 'Build and launch websites without coding.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+          {
+            icon: '🎯',
+            title: 'Design Thinking Workshops & Training',
+            subtitle: 'Educate teams on UX best practices.',
+            price: 100,
+            vatPercent: 5,
+            selected: false
+          },
+        ]
+      },
+    ];
+
+    const tabsContainer = document.getElementById('tabsContainer');
+    const tabIndicator = document.querySelector('.tab-indicator');
+    const calculatorSection = document.querySelector('.pricing-calculator');
+    let activeTabIndex = 0;
+
+    function renderTabs() {
+      tabsContainer.querySelectorAll('.tab').forEach(t => t.remove());
+      pricingData.forEach((section, i) => {
+        const tabDiv = document.createElement('div');
+        tabDiv.classList.add('tab');
+        if(i === activeTabIndex) tabDiv.classList.add('active');
+        tabDiv.setAttribute('data-index', i);
+        tabDiv.innerText = section.sectionName;
+        tabsContainer.appendChild(tabDiv);
+      });
+      tabsContainer.appendChild(tabIndicator);
+    }
+
+    function renderCalculatorBodies() {
+      calculatorSection.querySelectorAll('.calculator-body').forEach(b => b.remove());
+
+      pricingData.forEach((section, sIndex) => {
+        const bodyDiv = document.createElement('div');
+        bodyDiv.classList.add('calculator-body');
+        if(sIndex === activeTabIndex) {
+          bodyDiv.classList.add('active-body');
+        }
+        bodyDiv.id = section.sectionId;
+
+        let serviceHtml = "";
+        section.subsections.forEach((sub, subIndex) => {
+          const checked = sub.selected ? 'checked' : '';
+          const inputId = `${section.sectionId}-chk-${subIndex}`;
+          serviceHtml += `
+            <div class="service-item">
+              <div class="toggle-switch">
+                <input type="checkbox" id="${inputId}" data-section="${section.sectionId}" data-subindex="${subIndex}" ${checked}/>
+                <label for="${inputId}"></label>
+              </div>
+              <div class="service-info">
+                <h3>${sub.icon} ${sub.title}</h3>
+                <p>${sub.subtitle}</p>
+              </div>
+              <div class="service-price">${sub.price} AED<br>@ VAT</div>
+            </div>
+          `;
+        });
+
+        bodyDiv.innerHTML = `
+          <div class="service-items">
+            ${serviceHtml}
+          </div>
+          <div class="investment-area">
+            <h3>Total Investment</h3>
+            <p>This reflects only the sum of selected items in this section.</p>
+            <div class="investment-price" id="${section.sectionId}-subtotal">0 AED<br>@ VAT</div>
+          </div>
+        `;
+        const grandTotalDiv = document.querySelector('.grand-total');
+        calculatorSection.insertBefore(bodyDiv, grandTotalDiv);
+      });
+    }
+
+    function positionTabIndicator() {
+      const tabs = tabsContainer.querySelectorAll('.tab');
+      if(!tabs[activeTabIndex]) return;
+      const activeTab = tabs[activeTabIndex];
+      const rect = activeTab.getBoundingClientRect();
+      const parentRect = tabsContainer.getBoundingClientRect();
+      const offset = rect.left - parentRect.left;
+      tabIndicator.style.width = rect.width + "px";
+      tabIndicator.style.transform = `translateX(${offset}px)`;
+    }
+
+    function setActiveTab(i) {
+      activeTabIndex = i;
+      tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tabsContainer.querySelector(`.tab[data-index='${i}']`).classList.add('active');
+
+      calculatorSection.querySelectorAll('.calculator-body').forEach((body, idx) => {
+        body.classList.remove('active-body');
+        if(idx === i) body.classList.add('active-body');
+      });
+      positionTabIndicator();
+      updateAllSubtotals();
+      updateGrandTotal();
+    }
+
+    function updateAllSubtotals() {
+      pricingData.forEach(section => {
+        let sum = 0;
+        section.subsections.forEach(sub => {
+          if(sub.selected) {
+            const vat = (sub.price * sub.vatPercent) / 100;
+            sum += (sub.price + vat);
+          }
+        });
+        const subEl = document.getElementById(section.sectionId + "-subtotal");
+        if(subEl) {
+          subEl.innerHTML = `${sum} AED<br>@ VAT`;
+        }
+      });
+    }
+
+    function updateGrandTotal() {
+      let total = 0;
+      pricingData.forEach(s => {
+        s.subsections.forEach(sub => {
+          if(sub.selected) {
+            const vat = (sub.price * sub.vatPercent)/100;
+            total += (sub.price + vat);
+          }
+        });
+      });
+      document.getElementById('grandTotalAmt').textContent = `${total.toFixed(2)} AED`;
+    }
+
+    function onCheckboxChange(e) {
+      const input = e.target;
+      if(input.type === 'checkbox') {
+        const sid = input.getAttribute('data-section');
+        const subIdx = parseInt(input.getAttribute('data-subindex'), 10);
+        const sec = pricingData.find(s => s.sectionId === sid);
+        if(!sec) return;
+        sec.subsections[subIdx].selected = input.checked;
+        updateAllSubtotals();
+        updateGrandTotal();
+      }
+    }
+
+    /***********************************************************************
+     * 7) "GET STARTED" => SEND JSON
+     ***********************************************************************/
+    const getStartedBtn = document.getElementById('getStartedBtn');
+    getStartedBtn.addEventListener('click', async (evt) => {
+      evt.preventDefault();
+      const name = getCookie("name");
+      const email = getCookie("email");
+      const uid = getCookie("uid");
+
+      // Check if any is missing -> delete them all
+      if(!name || !email || !uid) {
+        onGoogleLoginClick();
+        return;
+      }
+      showLoader();
+      try {
+        // Build final JSON
+        const finalSections = pricingData.map(sec => {
+          const subs = sec.subsections
+            .filter(s => s.selected)
+            .map(s => ({
+              title: s.title,
+              subtitle: s.subtitle,
+              price: s.price,
+              vatPercent: s.vatPercent
+            }));
+          return {
+            sectionName: sec.sectionName,
+            subsections: subs
+          };
+        });
+
+        const userName = getCookie("name") || "Anonymous";
+        const userEmail = getCookie("email") || "noemail@unknown.com";
+        const userUID = getCookie("uid") || "UNAUTHORIZED";
+
+        const payload = {
+          uid: userUID,
+          name: userName,
+          email: userEmail,
+          sections: finalSections
+        };
+
+        console.log("Sending final JSON to /createProject:", payload);
+
+        // Example call:
+         const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/createProject", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify(payload)
+        });
+         const data = await resp.json();
+         console.log("Response from createProject:", data);
+
+        await new Promise(r => setTimeout(r, 1200)); // simulate
+
+        window.location.href="/dashboard.html";
+      } catch(e) {
+        console.error("Error sending final data:", e);
+        alert("Error sending data. See console.");
+      } finally {
+        hideLoader();
+      }
+    });
+
+    /***********************************************************************
+     * 8) CONTACT FORM => /sendContact
+     ***********************************************************************/
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      showLoader();
+      try {
+        const name = document.getElementById('contactName').value;
+        const email = document.getElementById('contactEmail').value;
+        const phone = document.getElementById('contactPhone').value;
+        const query = document.getElementById('contactQuery').value;
+
+        const payload = { name, email, phone, message: query };
+
+        // Example:
+         const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/sendContact", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify(payload)
+         });
+         const data = await resp.json();
+         console.log("Response from /sendContact:", data);
+
+        await new Promise(r => setTimeout(r, 1200)); // simulate
+
+        alert("Message sent! We'll be in touch soon.");
+        contactForm.reset();
+      } catch(e) {
+        console.error("Error sending contact form:", e);
+        alert("Failed to send. Check console.");
+      } finally {
+        hideLoader();
+      }
+    });
+
+    /***********************************************************************
+     * ON PAGE LOAD
+     ***********************************************************************/
+    window.addEventListener('load', () => {
+      // Build top bar (login or logout)
+      buildTopBar();
+
+      // Render the tabs & calculator bodies
+      renderTabs();
+      renderCalculatorBodies();
+      positionTabIndicator();
+
+      // By default set active tab = 0
+      setActiveTab(0);
+
+      // Listen for tab clicks
+      tabsContainer.addEventListener('click', (e) => {
+        if(e.target.classList.contains('tab')) {
+          const idx = parseInt(e.target.getAttribute('data-index'), 10);
+          setActiveTab(idx);
+        }
+      });
+
+      // Listen for toggles
+      calculatorSection.addEventListener('change', onCheckboxChange);
+
+      // Initial totals
+      updateAllSubtotals();
+      updateGrandTotal();
+    });
+
+    // reposition the tab-indicator on window resize
+    window.addEventListener('resize', positionTabIndicator);
+  </script>
+</body>
+</html>

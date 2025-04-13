@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Dashboard</title>
+  <style>
+    /* -------------------------------------------------------
+       Basic Reset & Global Styles
+    ---------------------------------------------------------*/
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #3701ae;
+      color: #fff;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    /* -------------------------------------------------------
+       Loader Overlay
+    ---------------------------------------------------------*/
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid #fff;
+      border-top: 8px solid #3701ae;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* -------------------------------------------------------
+       Page Title
+    ---------------------------------------------------------*/
+    .dashboard-title {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 32px;
+      font-weight: 600;
+    }
+    /* -------------------------------------------------------
+       Projects Container
+    ---------------------------------------------------------*/
+    .projects-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    /* -------------------------------------------------------
+       Project Card - Full width on larger screens
+    ---------------------------------------------------------*/
+    .project-card {
+      background-color: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .project-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 0.5rem;
+    }
+    .project-id {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    .project-user {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+    /* -------------------------------------------------------
+       Sections & Subsections Styling
+    ---------------------------------------------------------*/
+    .sections-container {
+      margin: 0.5rem 0;
+    }
+    .section-item {
+      margin-bottom: 1rem;
+      background-color: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.5rem;
+    }
+    .section-name {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 2px;
+    }
+    .subsections-list {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+    .subsection-item {
+      margin-left: 0.5rem;
+      padding: 0.2rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .subsection-info {
+      font-size: 14px;
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .subsection-price {
+      font-weight: 500;
+      font-size: 14px;
+      text-align: right;
+    }
+    .total-price {
+      margin-top: 0.2rem;
+      font-weight: 600;
+      text-align: right;
+      font-size: 16px;
+    }
+    /* -------------------------------------------------------
+       Timeline Styling
+    ---------------------------------------------------------*/
+    .timeline-container {
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      padding-top: 0.5rem;
+    }
+    .timeline-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .timeline-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .timeline-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background-color: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+    }
+    .timeline-status {
+      font-weight: 600;
+      font-size: 14px;
+      color: #05d76a;
+    }
+    .timeline-time {
+      font-size: 12px;
+      color: #bbb;
+    }
+    /* -------------------------------------------------------
+       Invoice Link Styling
+    ---------------------------------------------------------*/
+    .invoice-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #05d76a;
+      font-size: 14px;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+    /* -------------------------------------------------------
+       Responsive Adjustments
+    ---------------------------------------------------------*/
+    @media (max-width: 600px) {
+      body {
+        padding: 0.5rem;
+      }
+      .projects-container {
+        gap: 1rem;
+      }
+      .project-card {
+        padding: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader Overlay -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- Page Title -->
+  <h1 class="dashboard-title">User Dashboard</h1>
+
+  <!-- Container for Projects -->
+  <div class="projects-container" id="projectsContainer">
+    <!-- Project cards will be rendered here -->
+  </div>
+
+  <script>
+    /***********************************************************************
+     * 1) Cookie Utilities
+     ***********************************************************************/
+    function getCookie(cname) {
+      const name = cname + "=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) === 0) {
+          return decodeURIComponent(c.substring(name.length, c.length));
+        }
+      }
+      return "";
+    }
+
+    function deleteCookie(cname) {
+      document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    /***********************************************************************
+     * 2) Check Authentication via Cookies
+     ***********************************************************************/
+    const uid = getCookie("uid");
+    const userName = getCookie("name");
+    const userEmail = getCookie("email");
+
+    if (!uid || !userName || !userEmail) {
+      deleteCookie("uid");
+      deleteCookie("name");
+      deleteCookie("email");
+      window.location.href = "index.html";
+    }
+
+    /***********************************************************************
+     * 3) Loader Helpers
+     ***********************************************************************/
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    function showLoader() {
+      loaderOverlay.classList.add('active');
+    }
+    function hideLoader() {
+      loaderOverlay.classList.remove('active');
+    }
+
+    /***********************************************************************
+     * 4) Fetch User Data (via /login API)
+     ***********************************************************************/
+    const projectsContainer = document.getElementById('projectsContainer');
+    async function fetchUserData() {
+      showLoader();
+      try {
+        const payload = {
+          uid: uid,
+          name: userName,
+          email: userEmail
+        };
+        const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!resp.ok) {
+          throw new Error(`Network response not ok. Status: ${resp.status}`);
+        }
+        const data = await resp.json();
+        // Expect response: { projects: { projectId: { ... }, ... } }
+        if (!data.projects) {
+          throw new Error("No projects returned in response.");
+        }
+        renderProjects(data.projects);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        alert("Failed to fetch user data. See console for details.");
+      } finally {
+        hideLoader();
+      }
+    }
+
+    /***********************************************************************
+     * 5) Render Projects (Static view – no edit controls)
+     ***********************************************************************/
+    function renderProjects(projectsObj) {
+      projectsContainer.innerHTML = "";
+      // projectsObj is an object mapping projectId to project details.
+      const projectIds = Object.keys(projectsObj);
+      // Optionally, sort projectIds by createdAt:
+      // projectIds.sort((a, b) => projectsObj[b].createdAt._seconds - projectsObj[a].createdAt._seconds);
+
+      projectIds.forEach(projectId => {
+        const proj = projectsObj[projectId];
+
+        const card = document.createElement('div');
+        card.classList.add('project-card');
+
+        // Header
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('project-header');
+        headerDiv.innerHTML = `
+          <div class="project-id">Project ID: ${projectId}</div>
+          <div class="project-user">User: ${proj.userName} | ${proj.userEmail}</div>
+        `;
+
+        // Sections and Subsections
+        const sectionsDiv = document.createElement('div');
+        sectionsDiv.classList.add('sections-container');
+        let totalPrice = 0;
+        if (Array.isArray(proj.sections)) {
+          proj.sections.forEach(sec => {
+            const sectionEl = document.createElement('div');
+            sectionEl.classList.add('section-item');
+            sectionEl.innerHTML = `<div class="section-name">${sec.sectionName}</div>`;
+            if (Array.isArray(sec.subsections)) {
+              const ul = document.createElement('ul');
+              ul.classList.add('subsections-list');
+              sec.subsections.forEach(sub => {
+                const li = document.createElement('li');
+                li.classList.add('subsection-item');
+                const price = Number(sub.price) || 0;
+                const vat = Number(sub.vatPercent) || 0;
+                const total = price + (price * vat / 100);
+                totalPrice += total;
+                li.innerHTML = `
+                  <div class="subsection-info">
+                    ${sub.title} <br/><span style="opacity:0.8;font-size:12px;">${sub.subtitle}</span>
+                  </div>
+                  <div class="subsection-price">${price.toFixed(2)} + ${vat}% VAT = ${total.toFixed(2)}</div>
+                `;
+                ul.appendChild(li);
+              });
+              sectionEl.appendChild(ul);
+            }
+            sectionsDiv.appendChild(sectionEl);
+          });
+        }
+        // Total Price
+        const totalEl = document.createElement('div');
+        totalEl.classList.add('total-price');
+        totalEl.textContent = `Total Price: ${totalPrice.toFixed(2)}`;
+        sectionsDiv.appendChild(totalEl);
+
+        // Progress Timeline
+        const timelineDiv = document.createElement('div');
+        timelineDiv.classList.add('timeline-container');
+        timelineDiv.innerHTML = `<div class="timeline-title">Progress Timeline</div>`;
+        const timelineList = document.createElement('ul');
+        timelineList.classList.add('timeline-list');
+        if (Array.isArray(proj.progress)) {
+          const reversed = [...proj.progress].reverse();
+          reversed.forEach(item => {
+            const li = document.createElement('li');
+            li.classList.add('timeline-item');
+            const statusDiv = document.createElement('div');
+            statusDiv.classList.add('timeline-status');
+            statusDiv.textContent = item.status;
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('timeline-time');
+            const millis = Number(item.timeStamp);
+            if (!isNaN(millis)) {
+              const d = new Date(millis);
+              const day = String(d.getDate()).padStart(2, '0');
+              const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+              const month = monthNames[d.getMonth()];
+              const year = d.getFullYear();
+              let hour = d.getHours();
+              let minute = d.getMinutes();
+              if (minute < 10) minute = "0" + minute;
+              timeDiv.textContent = `${day} ${month} ${year} ${hour}:${minute}`;
+            } else {
+              timeDiv.textContent = "Invalid date";
+            }
+            li.appendChild(statusDiv);
+            li.appendChild(timeDiv);
+            timelineList.appendChild(li);
+          });
+        }
+        timelineDiv.appendChild(timelineList);
+
+        // Invoice PDF Link
+        const invoiceLink = document.createElement('div');
+        invoiceLink.classList.add('invoice-link');
+        if (proj.invoiceURL) {
+          invoiceLink.innerHTML = `<span>📄 Invoice PDF</span>`;
+          invoiceLink.addEventListener('click', () => {
+            window.open(proj.invoiceURL, "_blank");
+          });
+        } else {
+          invoiceLink.textContent = "No Invoice PDF";
+          invoiceLink.style.opacity = "0.5";
+          invoiceLink.style.cursor = "default";
+        }
+
+        // Assemble Card
+        card.appendChild(headerDiv);
+        card.appendChild(sectionsDiv);
+        card.appendChild(timelineDiv);
+        card.appendChild(invoiceLink);
+
+        projectsContainer.appendChild(card);
+      });
+    }
+
+    /***********************************************************************
+     * 6) On Page Load: Fetch User Data
+     ***********************************************************************/
+    window.addEventListener('load', () => {
+      fetchUserData();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <style>
+    /* -------------------------------------------------------
+       Basic Reset & Global
+    ---------------------------------------------------------*/
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #3701ae;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      padding: 1rem;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Loader Overlay */
+    .loader-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .loader-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 8px solid #fff;
+      border-top: 8px solid #3701ae;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Page Title */
+    .admin-title {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    /* Projects Container */
+    .projects-container {
+      display: flex;
+      flex-direction: column; /* each card on its own row */
+      gap: 2rem;
+      width: 100%;
+      max-width: 1300px; /* big container, centered on large screens */
+      margin: 0 auto; 
+    }
+
+    /* Project Card - now full width by default */
+    .project-card {
+      background-color: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      width: 100%; /* full width */
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .project-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 0.5rem;
+    }
+    .project-id {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    .project-user {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    /* Sections & Subsections (tabs) */
+    .sections-container {
+      margin: 0.5rem 0;
+    }
+    .section-item {
+      margin-bottom: 1rem;
+      background-color: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 0.5rem;
+    }
+    .section-name {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 2px;
+    }
+    .subsections-list {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+    .subsection-item {
+      margin-left: 0.5rem;
+      padding: 0.2rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .subsection-info {
+      font-size: 14px;
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .subsection-price {
+      font-weight: 500;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    /* Total Price Display */
+    .total-price {
+      margin-top: 0.2rem;
+      font-weight: 600;
+      text-align: right;
+      font-size: 16px;
+    }
+
+    /* Timeline (progress) */
+    .timeline-container {
+      border-top: 1px solid rgba(255,255,255,0.3);
+      padding-top: 0.5rem;
+    }
+    .timeline-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .timeline-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .timeline-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background-color: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+    }
+    .timeline-status {
+      font-weight: 600;
+      font-size: 14px;
+      color: #05d76a; /* highlight color */
+    }
+    .timeline-time {
+      font-size: 12px;
+      color: #bbb;
+    }
+
+    /* Invoice Link */
+    .invoice-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #05d76a;
+      font-size: 14px;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+
+    /* Status Update Block */
+    .status-update {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.3);
+      padding-top: 0.5rem;
+    }
+    .dropdown-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap; /* so on smaller screens it can wrap nicely */
+    }
+    select {
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      background-color: #fff;
+      color: #3701ae;
+    }
+    .update-btn {
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      background-color: #05d76a;
+      color: #3701ae;
+      border-radius: 4px;
+      font-weight: 600;
+      border: none;
+      transition: filter 0.2s;
+    }
+    .update-btn:hover {
+      filter: brightness(1.2);
+    }
+
+    /* Responsive: smaller screens => less body padding, narrower gaps */
+    @media (max-width: 600px) {
+      body {
+        padding: 0.5rem;
+      }
+      .projects-container {
+        gap: 1rem;
+      }
+      .project-card {
+        padding: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader Overlay -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- Page Title -->
+  <h1 class="admin-title">Admin Dashboard</h1>
+
+  <!-- Container for Projects -->
+  <div class="projects-container" id="projectsContainer">
+    <!-- Project cards will be inserted here by JS -->
+  </div>
+
+  <script>
+    /***********************************************************************
+     * 1) Cookie Utilities
+     ***********************************************************************/
+    function getCookie(cname) {
+      const name = cname + "=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1);
+        if (c.indexOf(name) === 0) {
+          return decodeURIComponent(c.substring(name.length, c.length));
+        }
+      }
+      return "";
+    }
+
+    function deleteCookie(cname) {
+      document.cookie = cname+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    /***********************************************************************
+     * 2) Check Auth (uid, name, email)
+     ***********************************************************************/
+    const uid = getCookie("uid");
+    const userName = getCookie("name");
+    const userEmail = getCookie("email");
+
+    if (!uid || !userName || !userEmail) {
+      // Missing -> clear all cookies, redirect
+      deleteCookie("uid");
+      deleteCookie("name");
+      deleteCookie("email");
+      window.location.href = "index.html";
+    } else {
+      // Check if email is admin
+      if (userEmail.toLowerCase() !== "realak9439@gmail.com") {
+        // Not admin => redirect to normal dashboard
+        window.location.href = "dashboard.html";
+      }
+    }
+
+    /***********************************************************************
+     * 3) Loader helpers
+     ***********************************************************************/
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    function showLoader() {
+      loaderOverlay.classList.add('active');
+    }
+    function hideLoader() {
+      loaderOverlay.classList.remove('active');
+    }
+
+    /***********************************************************************
+     * 4) Fetch Admin Data (getAdminData)
+     ***********************************************************************/
+    const projectsContainer = document.getElementById('projectsContainer');
+    async function fetchAdminData() {
+      showLoader();
+      try {
+        const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/getAdminData");
+        if (!resp.ok) {
+          throw new Error(`Network response not ok. Status: ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (!data.projects) {
+          throw new Error("No projects returned in the response");
+        }
+        renderProjects(data.projects);
+      } catch (err) {
+        console.error("Error fetching admin data:", err);
+        alert("Failed to fetch admin data. Check console for details.");
+      } finally {
+        hideLoader();
+      }
+    }
+
+    /***********************************************************************
+     * 5) Render Projects
+     ***********************************************************************/
+    function renderProjects(projects) {
+      projectsContainer.innerHTML = ""; // clear
+
+      // If you want them sorted, do so here. For example:
+      // projects.sort((a,b)=> b.createdAt._seconds - a.createdAt._seconds);
+
+      projects.forEach(proj => {
+        const card = document.createElement('div');
+        card.classList.add('project-card');
+
+        // project header
+        const headerDiv = document.createElement('div');
+        headerDiv.classList.add('project-header');
+        headerDiv.innerHTML = `
+          <div class="project-id">Project ID: ${proj.projectId}</div>
+          <div class="project-user">User: ${proj.userName} | ${proj.userEmail}</div>
+        `;
+
+        // sections
+        const sectionsDiv = document.createElement('div');
+        sectionsDiv.classList.add('sections-container');
+
+        // we'll build subsections & sum the price
+        let totalPrice = 0;
+        if (Array.isArray(proj.sections)) {
+          proj.sections.forEach(sec => {
+            // build each section
+            const sectionEl = document.createElement('div');
+            sectionEl.classList.add('section-item');
+            sectionEl.innerHTML = `<div class="section-name">${sec.sectionName}</div>`;
+
+            // build subsections
+            if (Array.isArray(sec.subsections)) {
+              const ul = document.createElement('ul');
+              ul.classList.add('subsections-list');
+
+              sec.subsections.forEach(sub => {
+                const li = document.createElement('li');
+                li.classList.add('subsection-item');
+                // Price + VAT
+                const price = Number(sub.price) || 0;
+                const vat = Number(sub.vatPercent) || 0;
+                const total = price + (price * vat / 100);
+                totalPrice += total;
+
+                li.innerHTML = `
+                  <div class="subsection-info">
+                    ${sub.title} <br/><span style="opacity:0.8;font-size:12px;">${sub.subtitle}</span>
+                  </div>
+                  <div class="subsection-price">${price.toFixed(2)} + ${vat}% VAT = ${total.toFixed(2)}</div>
+                `;
+                ul.appendChild(li);
+              });
+              sectionEl.appendChild(ul);
+            }
+
+            sectionsDiv.appendChild(sectionEl);
+          });
+        }
+
+        // total price
+        const totalEl = document.createElement('div');
+        totalEl.classList.add('total-price');
+        totalEl.textContent = `Total Price: ${totalPrice.toFixed(2)}`;
+        sectionsDiv.appendChild(totalEl);
+
+        // timeline
+        const timelineDiv = document.createElement('div');
+        timelineDiv.classList.add('timeline-container');
+        timelineDiv.innerHTML = `<div class="timeline-title">Progress Timeline</div>`;
+
+        const timelineList = document.createElement('ul');
+        timelineList.classList.add('timeline-list');
+
+        // progress in reverse chronological
+        if (Array.isArray(proj.progress)) {
+          const reversed = [...proj.progress].reverse();
+          reversed.forEach(item => {
+            const li = document.createElement('li');
+            li.classList.add('timeline-item');
+
+            const statusDiv = document.createElement('div');
+            statusDiv.classList.add('timeline-status');
+            statusDiv.textContent = item.status;
+
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('timeline-time');
+            // parse item.timeStamp (millis) => date
+            const millis = Number(item.timeStamp);
+            if (!isNaN(millis)) {
+              const d = new Date(millis);
+              // format: 17 Sep 2025 13:45 (24hr)
+              const day = String(d.getDate()).padStart(2,'0');
+              const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+              const month = monthNames[d.getMonth()];
+              const year = d.getFullYear();
+              let hour = d.getHours(); // 0-23
+              let minute = d.getMinutes();
+              if (minute < 10) minute = "0"+minute;
+              timeDiv.textContent = `${day} ${month} ${year} ${hour}:${minute}`;
+            } else {
+              timeDiv.textContent = "Invalid date";
+            }
+
+            li.appendChild(statusDiv);
+            li.appendChild(timeDiv);
+            timelineList.appendChild(li);
+          });
+        }
+        timelineDiv.appendChild(timelineList);
+
+        // Invoice link
+        const invoiceLink = document.createElement('div');
+        invoiceLink.classList.add('invoice-link');
+        if (proj.invoiceURL) {
+          invoiceLink.innerHTML = `<span>📄 Invoice PDF</span>`;
+          invoiceLink.addEventListener('click', () => {
+            window.open(proj.invoiceURL, "_blank");
+          });
+        } else {
+          invoiceLink.textContent = "No Invoice PDF";
+          invoiceLink.style.opacity = "0.5";
+          invoiceLink.style.cursor = "default";
+        }
+
+        // status update
+        const statusUpdateDiv = document.createElement('div');
+        statusUpdateDiv.classList.add('status-update');
+
+        // We'll have a row with 2 dropdowns: status, paid
+        const dropdownRow = document.createElement('div');
+        dropdownRow.classList.add('dropdown-row');
+
+        // status dropdown
+        const statusSelect = document.createElement('select');
+        const statuses = ["Order Received", "In-Progress", "Completed", "Delivered"];
+        statuses.forEach(st => {
+          const opt = document.createElement('option');
+          opt.value = st;
+          opt.textContent = st;
+          statusSelect.appendChild(opt);
+        });
+        // default = last status in timeline?
+        if (Array.isArray(proj.progress) && proj.progress.length > 0) {
+          const lastStatus = proj.progress[proj.progress.length - 1].status;
+          if (lastStatus) {
+            statusSelect.value = lastStatus;
+          } else {
+            statusSelect.value = "Order Received";
+          }
+        }
+
+        // paid/unpaid dropdown
+        const paidSelect = document.createElement('select');
+        const paidOptTrue = document.createElement('option');
+        paidOptTrue.value = "true";
+        paidOptTrue.textContent = "Paid";
+        const paidOptFalse = document.createElement('option');
+        paidOptFalse.value = "false";
+        paidOptFalse.textContent = "Unpaid";
+        paidSelect.appendChild(paidOptTrue);
+        paidSelect.appendChild(paidOptFalse);
+
+        // if project has .paid === true => "Paid", else "Unpaid"
+        if (proj.hasOwnProperty("paid") && proj.paid === true) {
+          paidSelect.value = "true";
+        } else {
+          paidSelect.value = "false";
+        }
+
+        dropdownRow.appendChild(document.createTextNode("Status: "));
+        dropdownRow.appendChild(statusSelect);
+        dropdownRow.appendChild(document.createTextNode("Payment Status: "));
+        dropdownRow.appendChild(paidSelect);
+
+        // update button
+        const updateBtn = document.createElement('button');
+        updateBtn.classList.add('update-btn');
+        updateBtn.textContent = "Update Status on Server";
+        updateBtn.addEventListener('click', async () => {
+          const newStatus = statusSelect.value;
+          const paidVal = paidSelect.value; // "true" or "false"
+          const paidBool = (paidVal === "true");
+
+          showLoader();
+          try {
+            const payload = {
+              projectId: proj.projectId,
+              status: newStatus,
+              paid: paidBool
+            };
+            console.log("Sending /updateStatus with payload:", payload);
+
+            const resp = await fetch("https://us-central1-aamiribrahimdev.cloudfunctions.net/api/updateStatus", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            });
+            if (!resp.ok) {
+              throw new Error("Server returned non-OK: " + resp.status);
+            }
+            const responseData = await resp.json();
+            console.log("updateStatus response:", responseData);
+            alert("Status updated successfully.");
+
+            // Optionally re-fetch or just manually update the timeline
+            await fetchAdminData();
+          } catch (error) {
+            console.error("Error updating status:", error);
+            alert("Failed to update status. See console for details.");
+          } finally {
+            hideLoader();
+          }
+        });
+
+        statusUpdateDiv.appendChild(dropdownRow);
+        statusUpdateDiv.appendChild(updateBtn);
+
+        card.appendChild(headerDiv);
+        card.appendChild(sectionsDiv);
+        card.appendChild(timelineDiv);
+        card.appendChild(invoiceLink);
+        card.appendChild(statusUpdateDiv);
+
+        projectsContainer.appendChild(card);
+      });
+    }
+
+    /***********************************************************************
+     * On load -> fetch admin data
+     ***********************************************************************/
+    window.addEventListener('load', () => {
+      fetchAdminData();
+    });
+  </script>
+</body>
+</html>

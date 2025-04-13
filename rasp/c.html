@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welltime Peer to Peer Video Call</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsrsasign@10.5.22/lib/jsrsasign-all-min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: clip;
+        }
+        #video_div {
+            position: relative;
+            height: 100%;
+            background-color: black;
+            display: none;
+        }
+        video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #localVideoDiv {
+            width: 250px;
+            height: 200px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            border: 3px solid white;
+        }
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            background-color: #555;
+            padding: 10px 5px 10px 5px;
+            border-radius: 30px;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+        }
+        #controls img:not(#toggleMic) {
+            width: 50px;
+            cursor: pointer;
+            margin: 0 15px;
+        }
+        #toggleMic {
+            width: 50px;
+            cursor: pointer;
+            margin: 0 0 0 15px;
+        }
+        #toggleMic {
+            margin: 0 0 0 15px;
+        }
+        #timer {
+            display: none;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            color: #fff;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        #localSvgPlaceholder {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            bottom: 10px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 50px;
+            right: 10px;
+            border: 3px solid white;
+        }
+        .svgPlaceholder {
+            display: none; /* Initially hidden */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-family: 'Roboto', sans-serif;
+            transform: translate(-50%, -50%);
+            text-align: center; /* Center SVG text */
+            color: white; /* SVG text color */
+            font-size: 100px; /* SVG text size */
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            background-color: #888;
+        }
+
+        #leaveConfirmation {
+            width: 30%;
+            height: 25%;
+            border-radius: 20px;
+            border: 2px solid #fff;
+            text-align: center;
+            background-color: #aaa;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        #leaveConfirmation p {
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        #leaveConfirmation button {
+            width: 120px;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+        }
+
+        #stayButton {
+            background-color: blue;
+        }
+
+        #leaveButton {
+            background-color: red;
+        }
+        #controls div.mic-control {
+            margin: 0 15px 0 0;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        #selectaudio {
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            margin-left: 5px;
+        }
+        /* Adjusted CSS for audioSettings */
+        #audioSettings {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            background-color: #000;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            max-width: 200px;
+            width: 200px;
+            color: #fff;
+        }
+        #audioSettings label {
+            display: block;
+            margin: 5px 0;
+            font-weight: normal;
+            color: #fff;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+        }
+        #audioSettings select {
+            width: 100%;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 5px;
+        }
+        #controls div.mic-control {
+            margin: 0 15px 0 0;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        #controls i#selectaudio {
+            position: absolute;
+            top: -10px; /* Adjust as needed */
+            right: -10px; /* Adjust as needed */
+            color: white;
+            cursor: pointer;
+            font-size: 20px; /* Adjust size as needed */
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+        }
+        #toggleMic {
+            margin: 0 0 0 15px;
+        }
+        #controls div.participants-control {
+            margin: 0 15px 0 0;
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        #participantsList {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            background-color: #000;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            max-width: 200px;
+            width: 200px;
+            color: #fff;
+            text-align: left;
+        }
+        #participantsList div {
+            margin: 5px 0;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+        }
+        #join_notif {
+            display:none;
+            align-content: center;
+            position: absolute;
+            width: 200px;
+            height: 50px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 10px;
+            top: 80%;
+            text-align: center;
+            left: -100%; /* Start off-screen */
+           /* opacity: 0;*/
+            transition: opacity 1s; /* For fading out */
+            color: #000;
+        }
+
+        @keyframes slideIn {
+            from {
+                left: -100%;
+            }
+            to {
+                left: 0%; /* Adjust this as needed */
+                transform: translateX(0%); /* Center it */
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        #preVideoContainer {
+            width: 100%;
+            height: 100vh; /* Use 100vh for full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* This aligns items vertically center */
+            text-align: center;
+        }
+
+        #pretext {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            width: 100%; /* Setting width to manage overall space allocation */
+            /* Optional: You can adjust this for better responsiveness */
+        }
+
+        #pretxtpar {
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            white-space: normal; /* Allow text wrapping */
+            word-wrap: break-word; /* Break the word to prevent overflow */
+            margin-bottom: 20px;
+        }
+
+        #preurltxt {
+            display: inline-block;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            text-align: start;
+            padding: 5px 5px 5px 0;
+            width: 80%; /* Use 100% to take full width of its container */
+            white-space: nowrap; /* Prevent text from wrapping */
+            overflow: hidden; /* Hide overflowing text */
+            text-overflow: ellipsis; /* Show ellipsis when text overflows */
+        }
+
+        #precopyLink {
+            padding: 10px;
+            border: 1px solid #fff;
+            background-color: #005cbb;
+            color: white;
+            display: none;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 20px; /* Adds space above the copy link button */
+            margin-left: 10px; /* Space between the URL text and the button */
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="preVideoContainer">
+    <div id="pretext"><span id="pretxtpar"></span><span id="preurltxt"></span><span id="precopyLink">Copy Link</span></div>
+</div>
+<div id="video_div">
+    <div id="timer">00:00</div>
+    <div id="leaveConfirmation">
+        <p>Are you sure you want to leave the meeting?</p>
+        <button id="stayButton">Stay Here</button>
+        <button id="leaveButton">Leave</button>
+    </div>
+    <div id="remoteVideoDiv">
+        <video id="remoteVideo" autoplay></video>
+        <div id="remoteSvgPlaceholder" class="svgPlaceholder"></div>
+    </div>
+    <div id="localVideoDiv">
+        <video id="localVideo" autoplay muted></video>
+        <div id="localSvgPlaceholder" class="svgPlaceholder"></div>
+    </div>
+    <div id="controls">
+        <img id="toggleSpeaker" src="speaker_on.png" alt="Toggle Speaker">
+        <div class="mic-control">
+            <img id="toggleMic" src="mic_on.png" alt="Toggle Mic"/>
+            <i id="selectaudio" class="fas fa-caret-up"></i>
+            <div id="audioSettings">
+                <label for="microphoneSelect">Microphone</label>
+                <select id="microphoneSelect"></select>
+
+                <label for="speakerSelect">Speaker</label>
+                <select id="speakerSelect"></select>
+            </div>
+        </div>
+        <img id="toggleCamera" src="video_on.svg" alt="Toggle Camera">
+        <img id="leaveCall" src="leave_call.svg" alt="Leave Call"/>
+        <div class="participants-control">
+            <img id="participants" alt="Participants"/>
+            <div id="participantsList"></div>
+        </div>
+    </div>
+    <div id="join_notif"></div>
+</div>
+
+</div>
+<script>
+    document.getElementById("participants").src = getParticipantsSVG(1);
+    let leftSeconds = -1;
+    let isCallRejected = false;
+    let timedOut = false;
+    let hasPhoneRung = false;
+    let seconds = 0;
+    let hasNotifiedParentPage = false;
+    let userId;
+    let targetId;
+    let userName;
+    let participantsArray = [];
+    let shouldStartWithVideoOn = false;
+    let targetName;
+    let isTargetUserAvailable = false;
+    let isTargetUserConnected = false;
+    let secondsElapsed = 0;
+    let dataChannel;
+    let videoSender;
+    const configuration = {
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            {
+                urls: [
+                    "turn:meet.welltime.co.uk:3478",
+                    "turn:meet.welltime.co.uk:3478?transport=tcp"
+                ],
+                username: "aamir",
+                credential: "abcdefghijk",
+            }
+        ]
+    };
+    const signalingServerUrl = "wss://p2p.communications.welltime.co.uk:8083/signaling";
+    let localConnection;
+    let localStream;
+    let remoteStream;
+    let socket;
+    let isCaller = false;
+    var url = "";
+
+    async function initializeWebSocket() {
+        return new Promise((resolve, reject) => {
+            socket = new WebSocket(signalingServerUrl);
+            socket.onopen = function () {
+                console.log("Connected to the WebSocket server");
+                resolve();
+            };
+
+            socket.onerror = function (error) {
+                console.error("WebSocket Error: ", error);
+                reject(error);
+            };
+            socket.onmessage = async function (event) {
+                const message = JSON.parse(event.data);
+                console.log("Received message: ", message);
+                if (message.type === "offer") {
+                    await handleReceivedOffer(message);
+                } else if (message.type == "answer") {
+                    await handleReceivedAnswer(message);
+                } else if (message.type == "candidate" && message.candidate) {
+                    await handleReceivedCandidate(message);
+                } else if (message.type == "ringing") {
+                    hasPhoneRung = true;
+                    startEllipsisAnimation(`${targetName}'s phone is ringing`);
+                } else if (message.type == "disconnected") {
+                    if (message.reason =="rejected")
+                    isCallRejected = true;
+                    else if(message.reason =="timedout")
+                        timedOut = true;
+                }
+            };
+        });
+    }
+
+    async function handleReceivedOffer(message) {
+        console.log("Received offer");
+        await localConnection.setRemoteDescription(new RTCSessionDescription(message));
+        targetId = message.userId;
+        console.log("target Id received is " + targetId);
+        const answer = await localConnection.createAnswer();
+        await localConnection.setLocalDescription(answer);
+        socket.send(JSON.stringify({ type: "answer", sdp: answer.sdp, userId: userId, targetId: targetId }));
+    }
+
+    async function handleReceivedAnswer(message) {
+        console.log("Received answer");
+        await localConnection.setRemoteDescription(new RTCSessionDescription(message));
+    }
+
+    async function handleReceivedCandidate(message) {
+        console.log("Received ICE candidate: " + JSON.stringify(message));
+        const candidate = new RTCIceCandidate({
+            candidate: message.candidate,
+            sdpMid: message.id,
+            sdpMLineIndex: message.label
+        });
+        await localConnection.addIceCandidate(candidate);
+    }
+    function adjustVideoAspect(videoElement) {
+        // Get container dimensions from the #video_div element
+        const container = document.getElementById("video_div");
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        // Get the intrinsic dimensions of the video
+        const videoWidth = videoElement.videoWidth;
+        const videoHeight = videoElement.videoHeight;
+        
+        if (!videoWidth || !videoHeight) {
+            // If metadata is not available, do nothing
+            return;
+        }
+        
+        // Calculate aspect ratios
+        const videoRatio = videoWidth / videoHeight;
+        const containerRatio = containerWidth / containerHeight;
+        
+        if (videoRatio > containerRatio) {
+            // Video is wider relative to the container;
+            // Set height to 100% and adjust width automatically.
+            videoElement.style.height = "100%";
+            videoElement.style.width = "auto";
+            videoElement.style.top = "0";
+            // Center horizontally:
+            videoElement.style.left = ((containerWidth - videoElement.offsetWidth) / 2) + "px";
+        } else {
+            // Video is taller relative to the container;
+            // Set width to 100% and adjust height automatically.
+            videoElement.style.width = "100%";
+            videoElement.style.height = "auto";
+            videoElement.style.left = "0";
+            // Center vertically:
+            videoElement.style.top = ((containerHeight - videoElement.offsetHeight) / 2) + "px";
+        }
+        
+        // Optionally, you may want to enforce that the video fully shows without cropping.
+        // Setting object-fit to "contain" can help, though our JavaScript sizing should do the trick.
+        videoElement.style.objectFit = "contain";
+    }
+    
+    async function getLocalStream() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: { 
+                width: { ideal: 1920 }, 
+                height: { ideal: 1080 }
+            }, audio: true });
+            document.getElementById("localVideo").srcObject = localStream;
+            if (!shouldStartWithVideoOn) {
+                showSVG("local", userName.charAt(0), "#888");
+                document.getElementById("toggleCamera").src = "video_off.svg";
+            } else {
+                hideSVG("local");
+                document.getElementById("toggleCamera").src = "video_on.svg";
+            }
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+        }
+    }
+
+    function setupVideoTracks() {
+        localStream.getTracks().forEach(track => {
+            const sender = localConnection.addTrack(track, localStream);
+            if (track.kind === 'video') {
+                videoSender = sender;
+            }
+        });
+
+        localConnection.ontrack = function(event) {
+            if (!remoteStream) {
+                remoteStream = new MediaStream();
+                if(shouldStartWithVideoOn) {
+            document.getElementById("toggleCamera").click();
+            setTimeout(function() {
+            document.getElementById("toggleCamera").click();
+            }, 1000);
+                    hideSVG("remote");
+                }else {
+                    showSVG("remote", targetName.charAt(0), "#888");
+                }
+                console.log("targetUserConnected");
+                isTargetUserConnected = true;
+                hasPhoneRung = true;
+                secondsElapsed = seconds;
+                isTargetUserAvailable = true;
+                const remoteVideo = document.getElementById("remoteVideo");
+                remoteVideo.srcObject = remoteStream;
+                remoteVideo.onloadedmetadata = function() {
+                    adjustVideoAspect(remoteVideo);
+                };
+                document.getElementById("preVideoContainer").style.display = "none";
+                document.getElementById("video_div").style.display = "block";
+                addParticipant(targetName);
+                if (!isCaller) {
+                    showNotification(`${targetName} joined the meet`);
+                    playNotificationSound();
+                }
+            }
+            remoteStream.addTrack(event.track);
+        };
+    }
+
+    async function createOffer() {
+        const offer = await localConnection.createOffer();
+        await localConnection.setLocalDescription(offer);
+        console.log("Sending offer: ", offer.sdp);
+        socket.send(JSON.stringify({ type: "offer", sdp: offer.sdp, userId: userId, targetId: targetId }));
+    }
+    document.getElementById("localVideo").onloadedmetadata = function() {
+        adjustVideoAspect(this);
+    };
+    window.addEventListener('resize', function() {
+        const remoteVideo = document.getElementById("remoteVideo");
+        if (remoteVideo && remoteVideo.videoWidth) {
+            adjustVideoAspect(remoteVideo);
+        }
+        const localVideo = document.getElementById("localVideo");
+        if (localVideo && localVideo.videoWidth) {
+            adjustVideoAspect(localVideo);
+        }
+    });
+    
+    async function init() {
+        const claims = await getJwtClaims();
+        console.log(JSON.stringify(claims));
+        if(!claims)
+            userId = prompt("Enter your ID:");
+        else {
+            userId = claims.userId;
+            userName = claims.userName;
+            targetName = claims.targetName;
+            if (claims.shouldStartWithVideoOn) {
+                console.log("Should start exists and is " + claims.shouldStartWithVideoOn  + " type is " + typeof(claims.shouldStartWithVideoOn));
+                shouldStartWithVideoOn = claims.shouldStartWithVideoOn;
+            }else {
+                console.log("does not exist");
+            }
+        }
+        if(!claims)
+            isCaller = confirm("Are you the caller?");
+        else
+            isCaller = claims.isCaller;
+        localConnection = new RTCPeerConnection(configuration);
+
+        localConnection.onicecandidate = function(event) {
+            if (event.candidate && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "candidate", candidate: event.candidate.candidate, id: event.candidate.sdpMid, label: event.candidate.sdpMLineIndex, userId: userId, targetId: targetId }));
+            }
+        };
+
+        await getLocalStream();
+        setupVideoTracks();
+
+        await initializeWebSocket();
+        if(!shouldStartWithVideoOn) {
+            document.getElementById("toggleCamera").click();
+        }
+        if(isCaller)
+            setupDataChannel();
+        else
+            localConnection.ondatachannel = receiveDataChannel;
+        setInterval(updateCounter, 1000);
+        if (isCaller) {
+            isTargetUserAvailable = true;
+            if (!claims)
+                targetId = prompt("Enter the ID of the person you want to call:");
+            else
+                targetId = claims.targetId
+            socket.send(JSON.stringify({ type: "connect", role: "caller", userId: userId, targetId: targetId }));
+            await createOffer();
+        } else {
+            isCallRejected = false;
+            startEllipsisAnimation(`Calling ${targetName}`);
+            socket.send(JSON.stringify({ type: "connect", role: "receiver", userId: userId }));
+        }
+        addParticipant(userName);
+        const genClaims = {
+            userName: targetName,
+            targetName: userName,
+            userId: generateRandomString(),
+            targetId: userId,
+            isCaller: true,
+            shouldStartWithVideoOn: shouldStartWithVideoOn
+        };
+        const jwtToken = generateJwt(genClaims);
+        url = `https://aamiribrahimdev.web.app/c.html?jwt=${jwtToken}`;
+        document.getElementById("preurltxt").innerHTML = `${url}`;
+            document.getElementById("precopyLink").style.display="block";
+        document.getElementById("pretxtpar").innerHTML = `Calling ${targetName}`;
+    }
+    function receiveDataChannel(event) {
+        dataChannel = event.channel;
+        dataChannel.onopen = function() {
+            console.log("DataChannel opened");
+        };
+        dataChannel.onmessage = function(event) {
+            handleDataChannelMessage(event.data);
+        };
+    }
+
+    init().catch(error => {
+        console.error("WebSocket connection failed: ", error);
+    });
+    function setupDataChannel() {
+        dataChannel = localConnection.createDataChannel("chat");
+        dataChannel.onopen = function() {
+            console.log("DataChannel opened");
+        };
+        dataChannel.onmessage = function(event) {
+            handleDataChannelMessage(event.data);
+        };
+    }
+    function handleDataChannelMessage(message) {
+        console.log(`Received message via data channel: ${message}`)
+        const jsonMessage = JSON.parse(message);
+        switch (jsonMessage.settings) {
+            case "mic_turned_on":
+                console.log("Remote mic turned on");
+                break;
+            case "mic_turned_off":
+                console.log("Remote mic turned off");
+                break;
+            case "camera_turned_on":
+                hideSVG("remote");
+                console.log("Remote camera turned on");
+                break;
+            case "camera_turned_off":
+                showSVG("remote", targetName.charAt(0), "#888");
+                console.log("Remote camera turned off");
+                break;
+            case "left":
+                console.log("left and seconds are " + seconds);
+                leftSeconds = seconds;
+                break;
+            default:
+                console.log("Unknown message:", message);
+        }
+    }
+
+    function sendMessageThroughDataChannel(message) {
+        console.log("sending " + message);
+        if (dataChannel) {
+            if (dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({settings: message}));
+            } else {
+                console.log("data channel not open");
+            }
+        }
+    }
+    let ellipsisInterval = null;
+
+    function startEllipsisAnimation(text) {
+        const element = document.getElementById('pretxtpar');
+
+        // Stop any existing animation to prevent multiple intervals.
+        if (ellipsisInterval) {
+            clearInterval(ellipsisInterval);
+        }
+
+        let count = 0;
+        element.innerText = text; // Set the initial text without any dots.
+
+        // Start an interval to animate the ellipsis.
+        ellipsisInterval = setInterval(() => {
+            let dots = '.'.repeat(count % 4); // Cycle through 0 to 3 dots.
+            element.innerText = text + dots; // Update the text with the current number of dots.
+            count++;
+        }, 500); // Change dots every 500 milliseconds.
+    }
+
+
+    function stopEllipsisAnimation(text) {
+        if (ellipsisInterval) {
+            clearInterval(ellipsisInterval); // Stop the current animation.
+            ellipsisInterval = null;
+        }
+        const element = document.getElementById('pretxtpar');
+        element.innerText = text; // Set the text without any animation.
+    }
+    document.getElementById("toggleMic").onclick = function() {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+            audioTrack.enabled = !audioTrack.enabled;
+            this.src = audioTrack.enabled ? "mic_on.png" : "mic_off.png";
+            sendMessageThroughDataChannel(audioTrack.enabled ? "mic_turned_on" : "mic_turned_off");
+        }
+    };
+    function addParticipant(participantName) {
+        if (!participantsArray.includes(participantName)) {
+            participantsArray.push(participantName);
+            document.getElementById("participants").src = getParticipantsSVG(participantsArray.length);
+            updateParticipantsList();
+        }
+    } document.getElementById('participants').onclick = function(event) {
+        event.stopPropagation();
+        const participantsListDiv = document.getElementById('participantsList');
+        if (participantsListDiv.style.display === 'block') {
+            participantsListDiv.style.display = 'none';
+        } else {
+            updateParticipantsList();
+            participantsListDiv.style.display = 'block';
+        }
+    };
+    function updateParticipantsList() {
+        const participantsListDiv = document.getElementById("participantsList");
+        participantsListDiv.innerHTML = '';
+        participantsArray.forEach(name => {
+            const p = document.createElement('p');
+            p.textContent = name;
+            participantsListDiv.appendChild(p);
+        });
+    }
+
+    // Close participantsList when clicking outside
+    document.addEventListener('click', function(event) {
+        const participantsListDiv = document.getElementById('participantsList');
+        const participantsBtn = document.getElementById('participants');
+        if (participantsListDiv.style.display === 'block' && !participantsListDiv.contains(event.target) && !participantsBtn.contains(event.target)) {
+            participantsListDiv.style.display = 'none';
+        }
+    });
+
+    document.getElementById("precopyLink").onclick = function () {
+        navigator.clipboard.writeText(document.getElementById("preurltxt").innerHTML);
+    };
+
+    document.getElementById("toggleCamera").onclick = async function() {
+    console.log("clicked camera toggle button");
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            // Stop the video track and remove it
+            videoTrack.stop();
+            localStream.removeTrack(videoTrack);
+            document.getElementById('localVideo').srcObject = localStream;
+
+            // Replace the track in the RTCPeerConnection
+            if (videoSender) {
+                await videoSender.replaceTrack(null);
+            }
+
+            // Update the UI
+            showSVG("local", userName.charAt(0), "#888");
+            sendMessageThroughDataChannel("camera_turned_off");
+            this.src = "video_off.svg";
+        } else {
+            try {
+                // Reacquire the video track
+                const newStream = await navigator.mediaDevices.getUserMedia({ video: { 
+                    width: { ideal: 1920 }, 
+                    height: { ideal: 1080 }
+                } });
+                const newVideoTrack = newStream.getVideoTracks()[0];
+                localStream.addTrack(newVideoTrack);
+                document.getElementById('localVideo').srcObject = localStream;
+
+                // Replace the track in the RTCPeerConnection
+                if (videoSender) {
+                    await videoSender.replaceTrack(newVideoTrack);
+                } else {
+                    videoSender = localConnection.addTrack(newVideoTrack, localStream);
+                }
+
+                // Update the UI
+                hideSVG("local");
+                sendMessageThroughDataChannel("camera_turned_on");
+                this.src = "video_on.svg";
+            } catch (error) {
+                console.error('Error accessing video device.', error);
+            }
+        }
+    };
+
+    document.getElementById("leaveCall").onclick = function() {
+
+        sendMessageThroughDataChannel("left");
+        if (window.self !== window.top) {
+            console.log("Page is in an iframe");
+            const messageData = {
+                action: "meetingEnded",
+                leftBy: "localPeer",
+            };
+            leaveMeeting(`You left the meeting.`);
+            window.parent.postMessage(messageData, "*");
+        } else {
+            window.close();
+            console.log("Page is not in an iframe");
+        }
+    };
+
+    function leaveMeeting(str) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            // Stop the video track and remove it
+            videoTrack.stop();
+        }
+        socket = null;
+
+        stopEllipsisAnimation(str);
+        document.getElementById("preurltxt").style.display = "none";
+        document.getElementById("precopyLink").style.display = "none";
+        document.getElementById("video_div").style.display = "none";
+        document.getElementById("preVideoContainer").style.display = "flex";
+    }
+    document.getElementById("stayButton").onclick = function () {
+        document.getElementById("leaveConfirmation").style.display = "none";
+    }
+    document.getElementById("leaveButton").onclick = function () {
+        sendMessageThroughDataChannel("left");
+        window.close();
+    }
+    function showSVG(videoType, letter, backgroundColor) {
+        const svgPlaceholder = document.getElementById(videoType === 'local' ? 'localSvgPlaceholder' : 'remoteSvgPlaceholder');
+        svgPlaceholder.style.display = 'flex';
+        svgPlaceholder.style.backgroundColor = backgroundColor;
+        svgPlaceholder.textContent = letter;
+        document.getElementById(videoType === 'local' ? 'localVideo' : 'remoteVideo').style.display = 'none';
+    }
+    document.getElementById("toggleSpeaker").onclick = function() {
+        const remoteVideo = document.getElementById("remoteVideo");
+        remoteVideo.muted = !remoteVideo.muted;
+        this.src = remoteVideo.muted ? "speaker_off.svg" : "speaker_on.png";
+    };
+    function hideSVG(videoType) {
+        document.getElementById(videoType == 'local' ? 'localSvgPlaceholder' : 'remoteSvgPlaceholder').style.display = 'none';
+        document.getElementById(videoType == 'local' ? 'localVideo' : 'remoteVideo').style.display = 'block';
+    }
+    function getJwtClaims() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('jwt');
+        if (!token) {
+            console.error("JWT token is missing from the URL parameters.");
+            return null;
+        }
+
+        try {
+            const decodedToken = KJUR.jws.JWS.parse(token);
+            const claims = decodedToken.payloadObj; // Get the decoded payload
+            const requiredClaims = {
+                userId: claims.userId,
+                userName: claims.userName,
+                isCaller: claims.isCaller,
+                targetId: claims.targetId,
+                targetName: claims.targetName
+            };
+            if(claims.shouldStartWithVideoOn) {
+                requiredClaims.shouldStartWithVideoOn = claims.shouldStartWithVideoOn;
+            }
+            if (claims.isCaller) {
+                requiredClaims.targetId = claims.targetId;
+            }
+            return requiredClaims;
+        } catch (error) {
+            console.error("Error decoding JWT:", error);
+            return null;
+        }
+    }
+    function generateJwt(claims) {
+        const header = {alg: 'none', typ: 'JWT'};  // Use 'none' algorithm for an unsigned token
+        const sHeader = btoa(JSON.stringify(header));
+        const sPayload = btoa(JSON.stringify(claims));
+
+        // Since the 'none' algorithm is used, there is no need to sign the JWT
+        return `${sHeader}.${sPayload}.`;  // The signature part is empty
+    }
+    function updateCounter() {
+        seconds++;
+        if ((!isCaller) && (seconds == 15) && (!isTargetUserAvailable) && !hasPhoneRung && !isCallRejected && !timedOut)  {
+            stopEllipsisAnimation(`${targetName} appears to be unavailable. Either they don't have mobile app or they are offline, please send them the join link below.`);
+            document.getElementById("preurltxt").innerHTML = `${url}`;
+            document.getElementById("precopyLink").style.display="block";
+        }
+        if (isTargetUserConnected) {
+            let elapsed = seconds - secondsElapsed;
+            //document.getElementById("timer").textContent = getTime(elapsed);
+        }
+        if (isCallRejected) {
+            stopEllipsisAnimation(``);
+            document.getElementById("preurltxt").innerHTML = `${url}`;
+            document.getElementById("precopyLink").style.display="block";
+        }
+        if (timedOut) {
+            stopEllipsisAnimation(``);
+            document.getElementById("preurltxt").innerHTML = `${url}`;
+            document.getElementById("precopyLink").style.display="block";
+        }
+        if (leftSeconds > 0) {
+            if (window.self !== window.top) {
+                if (!hasNotifiedParentPage) {
+
+                    console.log("Page is in an iframe");
+                    const messageData = {
+                        action: "meetingEnded",
+                        leftBy: "remotePeer",
+                    };
+                    leaveMeeting(`${targetName} left the meeting.`)
+                    window.parent.postMessage(messageData, "*");
+                    hasNotifiedParentPage= true;
+                }
+            } else {
+                console.log("Page is not in an iframe");
+                document.getElementById('remoteVideo').style.display = 'none';
+                showNotification(`${targetName} left the meeting`);
+                if ((leftSeconds + 1) == seconds) {
+                    window.location.href = "https://welltime.co.uk";
+                }
+            }
+        }
+    }
+    function getTime(secs) {
+        let m = Math.floor(secs / 60), s = secs % 60;
+        let mstr, sstr;
+        if (m < 10)
+            mstr = `0${m}`;
+        if (s < 10)
+            sstr = `0${s}`;
+        return `${mstr}:${sstr}`;
+    }
+    function generateRandomString() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const charactersLength = characters.length;
+        for (let i = 0; i < 10; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+    async function listAudioDevices() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const micSelect = document.getElementById('microphoneSelect');
+        const speakerSelect = document.getElementById('speakerSelect');
+
+        micSelect.innerHTML = '';
+        speakerSelect.innerHTML = '';
+        console.log("Devices; "  + JSON.stringify(devices));
+        devices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `${device.kind === 'audioinput' ? 'Microphone' : 'Speaker'} ${device.deviceId}`;
+
+            if (device.kind === 'audioinput') {
+                micSelect.appendChild(option);
+            } else if (device.kind === 'audiooutput') {
+                speakerSelect.appendChild(option);
+            }
+        });
+        document.getElementById("audioSettings").style.display="block";
+    }
+    function playNotificationSound() {
+        const filePath = "join_notification_tune.mp3";
+        const audio = new Audio(filePath);
+        audio.play().catch(error => {
+            console.error('Error playing notification sound:', error);
+        });
+    }
+
+    async function selectMicrophone() {
+        const micSelect = document.getElementById('microphoneSelect');
+        const selectedMicId = micSelect.value;
+
+        try {
+            const constraints = {
+                audio: { deviceId: selectedMicId ? { exact: selectedMicId } : undefined },
+                video: { 
+                    width: { ideal: 1920 }, 
+                    height: { ideal: 1080 }
+                }
+            };
+            const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            // Replace the audio track in the localStream
+            const audioTrack = newStream.getAudioTracks()[0];
+            const sender = localConnection.getSenders().find(s => s.track.kind === 'audio');
+            if (sender) {
+                sender.replaceTrack(audioTrack);
+            }
+
+            // Update localStream and localVideo
+            localStream.removeTrack(localStream.getAudioTracks()[0]);
+            localStream.addTrack(audioTrack);
+
+            document.getElementById('localVideo').srcObject = localStream;
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+        }
+    }
+    document.getElementById('microphoneSelect').addEventListener('change', selectMicrophone);
+    document.getElementById('speakerSelect').addEventListener('change', selectSpeaker);
+    document.getElementById("selectaudio").onclick = function() {
+        listAudioDevices();
+    }
+    // Function to set the selected speaker as output for audio elements
+    function selectSpeaker() {
+        const speakerSelect = document.getElementById('speakerSelect');
+        const selectedSpeakerId = speakerSelect.value;
+        const videoElement = document.getElementById('localVideo');
+
+        if ('setSinkId' in videoElement) {
+            videoElement.setSinkId(selectedSpeakerId).then(() => {
+                console.log(`Speaker set to: ${selectedSpeakerId}`);
+            }).catch(error => {
+                console.error('Error setting speaker output:', error);
+            });
+        } else {
+            console.warn('setSinkId() is not supported in your browser.');
+        }
+    }
+    // Modified listAudioDevices function
+    async function listAudioDevices() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const micSelect = document.getElementById('microphoneSelect');
+        const speakerSelect = document.getElementById('speakerSelect');
+
+        micSelect.innerHTML = '';
+        speakerSelect.innerHTML = '';
+        devices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `${device.kind === 'audioinput' ? 'Microphone' : 'Speaker'} ${device.deviceId}`;
+
+            if (device.kind === 'audioinput') {
+                micSelect.appendChild(option);
+            } else if (device.kind === 'audiooutput') {
+                speakerSelect.appendChild(option);
+            }
+        });
+
+        const audioSettingsDiv = document.getElementById("audioSettings");
+        if (audioSettingsDiv.style.display === "block") {
+            audioSettingsDiv.style.display = "none";
+        } else {
+            audioSettingsDiv.style.display = "block";
+        }
+    }
+    // Close audioSettings when clicking outside
+    document.addEventListener('click', function(event) {
+        const audioSettingsDiv = document.getElementById('audioSettings');
+        const selectAudioBtn = document.getElementById('selectaudio');
+        if (audioSettingsDiv.style.display === 'block' && !audioSettingsDiv.contains(event.target) && !selectAudioBtn.contains(event.target)) {
+            audioSettingsDiv.style.display = 'none';
+        }
+    });
+    function getParticipantsSVG(numberOfParticipants) {
+        var svg = `<svg width="400px" height="400px" viewBox="-1 -1 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="13" fill="#555"/><path  d="M5 9.5C5 7.01472 7.01472 5 9.5 5C11.9853 5 14 7.01472 14 9.5C14 11.9853 11.9853 14 9.5 14C7.01472 14 5 11.9853 5 9.5Z" fill="#fff"/><path d="M14.3675 12.0632C14.322 12.1494 14.3413 12.2569 14.4196 12.3149C15.0012 12.7454 15.7209 13 16.5 13C18.433 13 20 11.433 20 9.5C20 7.567 18.433 6 16.5 6C15.7209 6 15.0012 6.2546 14.4196 6.68513C14.3413 6.74313 14.322 6.85058 14.3675 6.93679C14.7714 7.70219 15 8.5744 15 9.5C15 10.4256 14.7714 11.2978 14.3675 12.0632Z" fill="#fff"/><path  d="M4.64115 15.6993C5.87351 15.1644 7.49045 15 9.49995 15C11.5112 15 13.1293 15.1647 14.3621 15.7008C15.705 16.2847 16.5212 17.2793 16.949 18.6836C17.1495 19.3418 16.6551 20 15.9738 20H3.02801C2.34589 20 1.85045 19.3408 2.05157 18.6814C2.47994 17.2769 3.29738 16.2826 4.64115 15.6993Z" fill="#fff"/><path d="M14.8185 14.0364C14.4045 14.0621 14.3802 14.6183 14.7606 14.7837V14.7837C15.803 15.237 16.5879 15.9043 17.1508 16.756C17.6127 17.4549 18.33 18 19.1677 18H20.9483C21.6555 18 22.1715 17.2973 21.9227 16.6108C21.9084 16.5713 21.8935 16.5321 21.8781 16.4932C21.5357 15.6286 20.9488 14.9921 20.0798 14.5864C19.2639 14.2055 18.2425 14.0483 17.0392 14.0008L17.0194 14H16.9997C16.2909 14 15.5506 13.9909 14.8185 14.0364Z" fill="#fff"/><text x="12" y="4" font-family="Arial" font-size="5" fill="white"  text-anchor="middle">${numberOfParticipants}</text></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+    function showNotification(str) {
+        var notif = document.getElementById("join_notif");
+        notif.innerText = str;
+        notif.style.display = "block"; // Make the div visible
+        notif.style.animation = "slideIn 1s forwards"; // Start sliding in
+
+        setTimeout(function() {
+            // After sliding in, hold the position for 1 sec
+            setTimeout(function() {
+                // Start fading out after 1 sec of visibility
+                notif.style.opacity = '0';
+                setTimeout(function() {
+                    // Hide the div again after it fades out
+                    notif.style.display = 'none';
+                    notif.style.left = '-100%'; // Reset position for next time
+                    notif.style.opacity = '1'; // Reset opacity for next time
+                    notif.style.animation = ''; // Clear animations
+                }, 1000); // Timeout for fade out
+            }, 1500); // Timeout to stay visible
+        }, 1000); // Timeout for slide in
+    }
+
+</script>
+</body>
+</html>

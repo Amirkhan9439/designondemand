@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "aamiribrahimdev"
+  },
+  "targets": {
+    "aamiribrahimdev": {
+      "hosting": {
+        "designondemand": [
+          "designondemand"
+        ],
+        "aamiribrahimdev": [
+          "aamiribrahimdev"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

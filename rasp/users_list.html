@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users List</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">User List</h2>
+<div id="userTable"></div>
+
+<script>
+    const userName = prompt("Enter your Name: ");
+    // Function to fetch users from the API and display them in a table
+    function fetchUsers() {
+        const apiUrl = 'https://us-central1-mvuala-c53a9.cloudfunctions.net/cors/getUsers';
+
+        // Fetching users from the API
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const users = data.Users;
+                drawUserTable(users);
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    }
+
+    // Function to dynamically draw the user table
+    function drawUserTable(users) {
+        let tableHTML = '<table><thead><tr><th>Username</th><th>Action</th></tr></thead><tbody>';
+        users.forEach(user => {
+            tableHTML += `
+            <tr>
+                <td>${user.userName}</td>
+                <td><button onclick="callbyfcm('${user.FCM}', '${user.userName}')">Call</button></td>
+            </tr>
+        `;
+        });
+
+        tableHTML += '</tbody></table>';
+
+        document.getElementById('userTable').innerHTML = tableHTML;
+    }
+
+    // Function to handle the Call button click
+    function callbyfcm(FCM, userName) {
+        const userId = generateRandomString();
+        const claims = {
+            targetName: userName,
+            userId: userId,
+            userName: this.userName,
+            isCaller: false,
+            shouldStartWitHVideoTurnedOn: true,
+        };
+        callAPI(userName, FCM, userId);
+        const jwtToken = generateJwt(claims);
+        const url = `https://p2p.communications.welltime.co.uk:8083/cross_platform_meeting.html?jwt=${jwtToken}`;
+        window.open(url, '_blank');
+        console.log(`Calling ${userName} with FCM: ${FCM}`);
+
+    }
+
+    function callAPI(callerName, FCM, callerId) {
+        const apiUrl = 'https://us-central1-mvuala-c53a9.cloudfunctions.net/cors/call';
+
+        // Prepare the data for the POST request
+        const requestData = {
+            callerName: callerName,  // Replace with actual caller name
+            callerId: callerId,
+            token: FCM,
+            deviceType: "android",
+            shouldStartWithVideoTurnedOn: true,// Replace with actual reconnect ID (or generate dynamically)
+        };
+
+        // Send POST request to the /call endpoint
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Specify that we're sending JSON data
+            },
+            body: JSON.stringify(requestData) // Convert the data to JSON
+        });
+    }
+    function generateRandomString() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        const charactersLength = characters.length;
+
+        for (let i = 0; i < 10; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+
+        return result;
+    }
+    function generateJwt(claims) {
+        const header = {alg: 'none', typ: 'JWT'};  // Use 'none' algorithm for an unsigned token
+        const sHeader = btoa(JSON.stringify(header));
+        const sPayload = btoa(JSON.stringify(claims));
+        return `${sHeader}.${sPayload}.`;  // The signature part is empty
+    }
+    // Call the fetchUsers function on page load
+    window.onload = fetchUsers;
+
+</script>
+
+</body>
+</html>
